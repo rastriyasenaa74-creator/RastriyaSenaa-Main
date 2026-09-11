@@ -61,12 +61,18 @@
 <table class="table">
 <thead>
 <tr>
-<th>Application</th>
+<th>Application ID</th>
+<th>Member ID</th>
 <th>Name</th>
+<th>Father Name</th>
 <th>Mobile</th>
+<th>Email</th>
+<th>DOB</th>
+<th>Address</th>
 <th>State</th>
 <th>Mandal</th>
 <th>District</th>
+<th>Photo</th>
 <th>Status</th>
 <th>Post</th>
 <th>Action</th>
@@ -82,6 +88,18 @@
 </div>
 </div>
 
+
+
+<!-- MEMBER DETAILS MODAL -->
+<div id="memberDetailsModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;padding:20px;overflow:auto">
+  <div class="card" style="max-width:850px;margin:40px auto;background:#fff">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+      <h3 style="margin:0">Member Details</h3>
+      <button type="button" class="btn" id="closeMemberDetails">CLOSE</button>
+    </div>
+    <div id="memberDetailsContent" style="margin-top:20px"></div>
+  </div>
+</div>
 
 <!-- ADMIN MANAGEMENT -->
 <div id="adminManagement" class="card" style="display:none;margin-top:20px">
@@ -479,7 +497,7 @@ async function loadApps() {
   const rows = document.getElementById("rows");
 
   rows.innerHTML =
-    "<tr><td colspan='9'>Loading applications...</td></tr>";
+    "<tr><td colspan='15'>Loading applications...</td></tr>";
 
   try {
     const r = await api({
@@ -496,7 +514,7 @@ async function loadApps() {
       );
 
       rows.innerHTML =
-        "<tr><td colspan='9'>Unable to load applications.</td></tr>";
+        "<tr><td colspan='15'>Unable to load applications.</td></tr>";
 
       return;
     }
@@ -505,7 +523,7 @@ async function loadApps() {
 
     if (!apps.length) {
       rows.innerHTML =
-        "<tr><td colspan='9'>No applications found.</td></tr>";
+        "<tr><td colspan='15'>No applications found.</td></tr>";
 
       msg.style.display = "none";
       return;
@@ -517,17 +535,28 @@ async function loadApps() {
       const tr = document.createElement("tr");
 
       const application = document.createElement("td");
+      application.textContent = app.applicationId || "";
 
-      application.innerHTML =
-        escapeHtml(app.applicationId || "") +
-        "<br>" +
-        escapeHtml(app.memberId || "");
+      const memberId = document.createElement("td");
+      memberId.textContent = app.memberId || "—";
 
       const name = document.createElement("td");
       name.textContent = app.name || "";
 
+      const fatherName = document.createElement("td");
+      fatherName.textContent = app.fatherName || "";
+
       const mobile = document.createElement("td");
       mobile.textContent = app.mobile || "";
+
+      const email = document.createElement("td");
+      email.textContent = app.email || "—";
+
+      const dob = document.createElement("td");
+      dob.textContent = app.dob || "—";
+
+      const address = document.createElement("td");
+      address.textContent = app.address || "—";
 
       const state = document.createElement("td");
       state.textContent = app.state || "";
@@ -537,6 +566,23 @@ async function loadApps() {
 
       const district = document.createElement("td");
       district.textContent = app.district || "";
+
+      const photo = document.createElement("td");
+
+      if (app.photo) {
+        const img = document.createElement("img");
+        img.src = app.photo;
+        img.alt = "Member Photo";
+        img.style.width = "55px";
+        img.style.height = "65px";
+        img.style.objectFit = "cover";
+        img.style.borderRadius = "5px";
+        img.style.cursor = "pointer";
+        img.onclick = () => showMemberDetails(app);
+        photo.appendChild(img);
+      } else {
+        photo.textContent = "—";
+      }
 
       const status = document.createElement("td");
       status.textContent = app.status || "";
@@ -620,17 +666,29 @@ async function loadApps() {
             "Higher Level Post";
         }
 
-      } else {
-        action.textContent = "—";
       }
+
+      const detailsBtn = document.createElement("button");
+      detailsBtn.type = "button";
+      detailsBtn.className = "btn";
+      detailsBtn.textContent = "VIEW DETAILS";
+      detailsBtn.style.marginTop = "6px";
+      detailsBtn.onclick = () => showMemberDetails(app);
+      action.appendChild(detailsBtn);
 
       tr.append(
         application,
+        memberId,
         name,
+        fatherName,
         mobile,
+        email,
+        dob,
+        address,
         state,
         mandal,
         district,
+        photo,
         status,
         post,
         action
@@ -649,7 +707,7 @@ async function loadApps() {
     );
 
     rows.innerHTML =
-      "<tr><td colspan='9'>Error loading applications.</td></tr>";
+      "<tr><td colspan='15'>Error loading applications.</td></tr>";
   }
 }
 
@@ -728,6 +786,82 @@ async function act(applicationId, type) {
   }
 }
 
+
+
+/* =========================================================
+   MEMBER DETAILS
+   ========================================================= */
+
+function showMemberDetails(app) {
+  const modal = document.getElementById("memberDetailsModal");
+  const content = document.getElementById("memberDetailsContent");
+
+  const rows = [
+    ["Application ID", app.applicationId],
+    ["Member ID", app.memberId],
+    ["Name", app.name],
+    ["Father Name", app.fatherName],
+    ["Mobile", app.mobile],
+    ["Email", app.email],
+    ["DOB", app.dob],
+    ["Address", app.address],
+    ["State", app.state],
+    ["Mandal", app.mandal],
+    ["District", app.district],
+    ["Status", app.status],
+    ["Post", app.post],
+    ["Submitted At", app.submittedAt],
+    ["Approved At", app.approvedAt],
+    ["Assigned District Admin", app.assignedDistrictAdmin]
+  ];
+
+  let photoHtml = "";
+
+  if (app.photo) {
+    photoHtml =
+      '<div style="margin-bottom:20px;text-align:center">' +
+      '<img src="' + escapeHtml(app.photo) + '"' +
+      ' alt="Member Photo"' +
+      ' style="width:130px;height:160px;object-fit:cover;border-radius:8px;border:1px solid #ddd">' +
+      '</div>';
+  }
+
+  let tableHtml =
+    '<div style="overflow:auto">' +
+    '<table class="table">' +
+    '<tbody>';
+
+  rows.forEach(item => {
+    tableHtml +=
+      "<tr>" +
+      "<th style='text-align:left'>" +
+      escapeHtml(item[0]) +
+      "</th>" +
+      "<td>" +
+      escapeHtml(item[1] || "—") +
+      "</td>" +
+      "</tr>";
+  });
+
+  tableHtml +=
+    "</tbody></table></div>";
+
+  content.innerHTML =
+    photoHtml +
+    tableHtml;
+
+  modal.style.display = "block";
+}
+
+document.getElementById("closeMemberDetails").onclick = function() {
+  document.getElementById("memberDetailsModal").style.display = "none";
+};
+
+document.getElementById("memberDetailsModal").onclick = function(e) {
+  if (e.target === this) {
+    this.style.display = "none";
+  }
+};
 
 /* =========================================================
    SAVE POST
@@ -1675,7 +1809,7 @@ document.getElementById(
   document.getElementById(
     "rows"
   ).innerHTML =
-    "<tr><td colspan='9'>Applications load karne ke liye login karein.</td></tr>";
+    "<tr><td colspan='15'>Applications load karne ke liye login karein.</td></tr>";
 
   document.getElementById(
     "adminRows"
