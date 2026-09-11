@@ -8,7 +8,6 @@
 </head>
 
 <body>
-
 <header></header>
 
 <main>
@@ -21,91 +20,47 @@
 </div>
 
 <div id="loginBox" class="form">
-
 <form id="loginForm">
-
 <div class="formgrid">
-
 <div class="field">
 <label>Admin ID *</label>
-<input
-name="adminId"
-type="text"
-autocomplete="username"
-required>
+<input name="adminId" type="text" autocomplete="username" required>
 </div>
 
 <div class="field">
 <label>Admin Password *</label>
-<input
-name="password"
-type="password"
-autocomplete="current-password"
-required>
+<input name="password" type="password" autocomplete="current-password" required>
 </div>
-
 </div>
 
 <div class="buttons">
-<button
-type="submit"
-class="btn red">
-LOGIN
-</button>
+<button type="submit" class="btn red">LOGIN</button>
 </div>
 
 <div id="loginMsg" class="msg"></div>
-
 </form>
-
 </div>
 
 
 <div id="panel" style="display:none">
 
+<!-- APPLICATIONS -->
 <div class="card">
-
-<div style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-gap:10px;
-flex-wrap:wrap">
-
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
 <h3>Applications</h3>
 
 <div>
-
-<button
-type="button"
-class="btn red"
-id="refreshBtn">
-REFRESH
-</button>
-
-<button
-type="button"
-class="btn"
-id="logoutBtn">
-LOGOUT
-</button>
-
+<button type="button" class="btn red" id="refreshBtn">REFRESH</button>
+<button type="button" class="btn" id="logoutBtn">LOGOUT</button>
 </div>
-
 </div>
-
 
 <div id="panelMsg" class="msg"></div>
 
-
 <div class="tablewrap">
-
 <table class="table">
-
 <thead>
-
 <tr>
-
 <th>Application</th>
 <th>Name</th>
 <th>Mobile</th>
@@ -115,23 +70,110 @@ LOGOUT
 <th>Status</th>
 <th>Post</th>
 <th>Action</th>
-
 </tr>
-
 </thead>
 
 <tbody id="rows">
-
 <tr>
-<td colspan="9">
-Applications load karne ke liye login karein.
-</td>
+<td colspan="9">Applications load karne ke liye login karein.</td>
 </tr>
-
 </tbody>
-
 </table>
+</div>
+</div>
 
+
+<!-- ADMIN MANAGEMENT -->
+<div id="adminManagement" class="card" style="display:none;margin-top:20px">
+
+<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+<h3>Admin Management</h3>
+<button type="button" class="btn red" id="refreshAdminsBtn">REFRESH ADMINS</button>
+</div>
+
+<div id="adminMsg" class="msg"></div>
+
+<div class="form" style="margin-top:15px">
+<h4 style="margin-top:0">Appoint New Admin</h4>
+
+<form id="createAdminForm">
+
+<div class="formgrid">
+
+<div class="field">
+<label>Admin ID *</label>
+<input name="newAdminId" type="text" required>
+</div>
+
+<div class="field">
+<label>Password *</label>
+<input name="newPassword" type="password" required>
+</div>
+
+<div class="field">
+<label>Admin Email *</label>
+<input name="adminEmail" type="email" required>
+</div>
+
+<div class="field">
+<label>Admin Role *</label>
+<select name="role" id="adminRole" required>
+<option value="">Select Role</option>
+</select>
+</div>
+
+<div class="field">
+<label>State</label>
+<select name="state" id="adminState">
+<option value="">Select State</option>
+</select>
+</div>
+
+<div class="field">
+<label>Mandal</label>
+<select name="mandal" id="adminMandal" disabled>
+<option value="">Select Mandal</option>
+</select>
+</div>
+
+<div class="field">
+<label>District</label>
+<select name="district" id="adminDistrict" disabled>
+<option value="">Select District</option>
+</select>
+</div>
+
+</div>
+
+<div class="buttons">
+<button type="submit" class="btn red" id="createAdminBtn">APPOINT ADMIN</button>
+</div>
+
+</form>
+</div>
+
+
+<div class="tablewrap" style="margin-top:20px">
+<table class="table">
+<thead>
+<tr>
+<th>Admin ID</th>
+<th>Email</th>
+<th>Role</th>
+<th>State</th>
+<th>Mandal</th>
+<th>District</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="adminRows">
+<tr>
+<td colspan="8">Admin list load karne ke liye refresh karein.</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 </div>
@@ -142,23 +184,15 @@ Applications load karne ke liye login karein.
 </section>
 </main>
 
-
 <footer></footer>
-
 
 <script src="site.js"></script>
 
 <script>
-
 let admin = {};
-
-
-/* =========================================================
-   ALL POSTS
-   ========================================================= */
+let locations = [];
 
 const POSTS = [
-
   "सदस्य",
 
   "ब्लॉक अध्यक्ष",
@@ -190,16 +224,9 @@ const POSTS = [
   "राष्ट्रीय उपाध्यक्ष",
   "राष्ट्रीय महासचिव",
   "राष्ट्रीय सचिव"
-
 ];
 
-
-/* =========================================================
-   POST LEVEL
-   ========================================================= */
-
 const POST_LEVELS = {
-
   "सदस्य": "MEMBER",
 
   "ब्लॉक अध्यक्ष": "BLOCK",
@@ -231,234 +258,137 @@ const POST_LEVELS = {
   "राष्ट्रीय उपाध्यक्ष": "NATIONAL",
   "राष्ट्रीय महासचिव": "NATIONAL",
   "राष्ट्रीय सचिव": "NATIONAL"
-
 };
 
+function showMessage(el, text, success) {
+  if (!el) return;
 
-/* =========================================================
-   ESCAPE HTML
-   ========================================================= */
+  el.className = "msg " + (success ? "success" : "error");
+  el.textContent = text || "";
+  el.style.display = "block";
+}
 
-function escapeHtml(value) {
+function roleText(role) {
+  const r = String(role || "").toUpperCase();
 
-  return String(value || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  if (r === "MAIN") return "Main Admin";
+  if (r === "NATIONAL") return "National Admin";
+  if (r === "STATE") return "State Admin";
+  if (r === "MANDAL") return "Mandal Admin";
+  if (r === "DISTRICT") return "District Admin";
 
+  return role || "";
 }
 
 
 /* =========================================================
-   ROLE NAME
-   ========================================================= */
-
-function roleName(role) {
-
-  role = String(role || "").toUpperCase();
-
-  const names = {
-
-    MAIN: "Main Admin",
-    NATIONAL: "National Admin",
-    STATE: "State Admin",
-    MANDAL: "Mandal Admin",
-    DISTRICT: "District Admin"
-
-  };
-
-  return names[role] || role;
-
-}
-
-
-/* =========================================================
-   ALLOWED POSTS FOR ADMIN
+   POST PERMISSION - FRONTEND
    ========================================================= */
 
 function allowedPostsForAdmin(role) {
+  const r = String(role || "").toUpperCase();
 
-  role = String(role || "").toUpperCase();
+  const member = ["सदस्य"];
 
-  if (role === "MAIN") {
+  const block = [
+    "ब्लॉक अध्यक्ष",
+    "ब्लॉक उपाध्यक्ष",
+    "ब्लॉक महासचिव",
+    "ब्लॉक सचिव"
+  ];
 
-    return POSTS.slice();
+  const tehsil = [
+    "तहसील अध्यक्ष",
+    "तहसील उपाध्यक्ष",
+    "तहसील महासचिव",
+    "तहसील सचिव"
+  ];
 
+  const district = [
+    "जिला अध्यक्ष",
+    "जिला उपाध्यक्ष",
+    "जिला महासचिव",
+    "जिला सचिव"
+  ];
+
+  const mandal = [
+    "मण्डल अध्यक्ष",
+    "मण्डल उपाध्यक्ष",
+    "मण्डल महासचिव",
+    "मण्डल सचिव"
+  ];
+
+  const state = [
+    "प्रदेश अध्यक्ष",
+    "प्रदेश उपाध्यक्ष",
+    "प्रदेश महासचिव",
+    "प्रदेश सचिव"
+  ];
+
+  const national = [
+    "राष्ट्रीय अध्यक्ष",
+    "राष्ट्रीय उपाध्यक्ष",
+    "राष्ट्रीय महासचिव",
+    "राष्ट्रीय सचिव"
+  ];
+
+  if (r === "MAIN" || r === "NATIONAL") {
+    return []
+      .concat(member, block, tehsil, district, mandal, state, national);
   }
 
-
-  if (role === "NATIONAL") {
-
-    return POSTS.filter(function(post) {
-
-      const level = POST_LEVELS[post];
-
-      return [
-        "MEMBER",
-        "BLOCK",
-        "TEHSIL",
-        "DISTRICT",
-        "MANDAL",
-        "STATE",
-        "NATIONAL"
-      ].includes(level);
-
-    });
-
+  if (r === "STATE") {
+    return []
+      .concat(member, block, tehsil, district, mandal, state);
   }
 
-
-  if (role === "STATE") {
-
-    return POSTS.filter(function(post) {
-
-      const level = POST_LEVELS[post];
-
-      return [
-        "MEMBER",
-        "BLOCK",
-        "TEHSIL",
-        "DISTRICT",
-        "MANDAL",
-        "STATE"
-      ].includes(level);
-
-    });
-
+  if (r === "MANDAL") {
+    return []
+      .concat(member, block, tehsil, district, mandal);
   }
 
-
-  if (role === "MANDAL") {
-
-    return POSTS.filter(function(post) {
-
-      const level = POST_LEVELS[post];
-
-      return [
-        "MEMBER",
-        "BLOCK",
-        "TEHSIL",
-        "DISTRICT",
-        "MANDAL"
-      ].includes(level);
-
-    });
-
+  if (r === "DISTRICT") {
+    return []
+      .concat(member, block, tehsil, district);
   }
 
-
-  if (role === "DISTRICT") {
-
-    return POSTS.filter(function(post) {
-
-      const level = POST_LEVELS[post];
-
-      return [
-        "MEMBER",
-        "BLOCK",
-        "TEHSIL",
-        "DISTRICT"
-      ].includes(level);
-
-    });
-
-  }
-
-
-  return ["सदस्य"];
-
+  return [];
 }
-
-
-/* =========================================================
-   POST OPTIONS
-   ========================================================= */
-
-function postOptions(selected) {
-
-  selected = String(selected || "सदस्य");
-
-  const role = String(admin.role || "").toUpperCase();
-
-  const allowed = allowedPostsForAdmin(role);
-
-  let html = "";
-
-  allowed.forEach(function(post) {
-
-    html +=
-      "<option value=\"" +
-      escapeHtml(post) +
-      "\"" +
-      (post === selected ? " selected" : "") +
-      ">" +
-      escapeHtml(post) +
-      "</option>";
-
-  });
-
-
-  /*
-     अगर current post इस Admin के level से ऊपर है,
-     तो उसे dropdown में दिखाएँ लेकिन change करने न दें।
-  */
-
-  if (
-    selected &&
-    !allowed.includes(selected) &&
-    POSTS.includes(selected)
-  ) {
-
-    html =
-      "<option value=\"" +
-      escapeHtml(selected) +
-      "\" selected disabled>" +
-      escapeHtml(selected) +
-      " (Higher Level Post)" +
-      "</option>" +
-      html;
-
-  }
-
-
-  return html;
-
-}
-
-
-/* =========================================================
-   CHECK WHETHER ADMIN CAN CHANGE CURRENT POST
-   ========================================================= */
 
 function canChangePost(currentPost) {
-
-  const role = String(admin.role || "").toUpperCase();
-
-  const allowed = allowedPostsForAdmin(role);
-
-  return allowed.includes(String(currentPost || "सदस्य"));
-
+  return allowedPostsForAdmin(admin.role)
+    .includes(String(currentPost || "").trim());
 }
 
+function postOptions(selected) {
+  const allowed = allowedPostsForAdmin(admin.role);
+  const current = String(selected || "").trim();
 
-/* =========================================================
-   MESSAGE
-   ========================================================= */
+  let html = '<option value="">Select Post</option>';
 
-function showMessage(el, text, success) {
+  POSTS.forEach(post => {
+    if (allowed.includes(post)) {
+      html +=
+        '<option value="' +
+        escapeHtml(post) +
+        '"' +
+        (post === current ? " selected" : "") +
+        ">" +
+        escapeHtml(post) +
+        "</option>";
+    }
+  });
 
-  if (!el) return;
+  if (current && !allowed.includes(current)) {
+    html +=
+      '<option value="' +
+      escapeHtml(current) +
+      '" selected disabled>' +
+      escapeHtml(current) +
+      " (Higher Level Post)</option>";
+  }
 
-  el.className =
-    "msg " +
-    (success ? "success" : "error");
-
-  el.textContent = text || "";
-
-  el.style.display = "block";
-
+  return html;
 }
 
 
@@ -466,89 +396,43 @@ function showMessage(el, text, success) {
    LOGIN
    ========================================================= */
 
-document
-.getElementById("loginForm")
-.addEventListener("submit", async function(e) {
-
+document.getElementById("loginForm").addEventListener("submit", async function(e) {
   e.preventDefault();
 
   const form = e.target;
-
-  const msg =
-    document.getElementById("loginMsg");
-
-  const btn =
-    form.querySelector("button[type=submit]");
-
+  const msg = document.getElementById("loginMsg");
+  const btn = form.querySelector("button[type=submit]");
 
   admin = {
-
-    adminId:
-      String(
-        form.elements.adminId.value || ""
-      ).trim(),
-
-    password:
-      String(
-        form.elements.password.value || ""
-      )
-
+    adminId: String(form.elements.adminId.value || "").trim(),
+    password: String(form.elements.password.value || "")
   };
 
-
   if (!admin.adminId || !admin.password) {
-
-    showMessage(
-      msg,
-      "Admin ID aur Password dono enter karo.",
-      false
-    );
-
+    showMessage(msg, "Admin ID aur Password dono enter karo.", false);
     return;
-
   }
 
-
   btn.disabled = true;
-
   btn.textContent = "LOGIN...";
 
-
   try {
-
     const r = await api({
-
       action: "adminLogin",
-
       adminId: admin.adminId,
-
       password: admin.password
-
     });
 
-
     if (!r.success) {
-
-      showMessage(
-        msg,
-        r.message ||
-        "Invalid Admin ID or Password.",
-        false
-      );
-
+      showMessage(msg, r.message || "Invalid Admin ID or Password.", false);
       return;
-
     }
 
-
-    /*
-       Login response se Admin role/scope save
-    */
-
-    admin.role =
+    admin.role = String(
       r.role ||
       (r.admin && r.admin.role) ||
-      "";
+      ""
+    ).toUpperCase();
 
     admin.state =
       r.state ||
@@ -565,367 +449,180 @@ document
       (r.admin && r.admin.district) ||
       "";
 
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("panel").style.display = "block";
 
-    document
-      .getElementById("loginBox")
-      .style.display = "none";
-
-
-    document
-      .getElementById("panel")
-      .style.display = "block";
-
+    setupAdminManagement();
 
     await loadApps();
 
+    if (canManageAdmins()) {
+      await loadLocations();
+      await loadAdmins();
+    }
 
   } catch (err) {
-
-    showMessage(
-      msg,
-      err.message || "Login failed.",
-      false
-    );
-
+    showMessage(msg, err.message || "Login failed.", false);
   } finally {
-
     btn.disabled = false;
-
     btn.textContent = "LOGIN";
-
   }
-
 });
 
 
 /* =========================================================
-   LOAD APPLICATIONS
+   APPLICATIONS
    ========================================================= */
 
 async function loadApps() {
-
-  const msg =
-    document.getElementById("panelMsg");
-
-  const rows =
-    document.getElementById("rows");
-
+  const msg = document.getElementById("panelMsg");
+  const rows = document.getElementById("rows");
 
   rows.innerHTML =
-    "<tr><td colspan='9'>" +
-    "Loading applications..." +
-    "</td></tr>";
-
+    "<tr><td colspan='9'>Loading applications...</td></tr>";
 
   try {
-
     const r = await api({
-
       action: "adminList",
-
       adminId: admin.adminId,
-
       password: admin.password
-
     });
 
-
     if (!r.success) {
-
       showMessage(
         msg,
-        r.message ||
-        "Applications load nahi hui.",
+        r.message || "Applications load nahi hui.",
         false
       );
 
       rows.innerHTML =
-        "<tr><td colspan='9'>" +
-        "Unable to load applications." +
-        "</td></tr>";
+        "<tr><td colspan='9'>Unable to load applications.</td></tr>";
 
       return;
-
     }
 
-
-    /*
-       अगर backend ने role दिया है
-       तो उसे update कर दें।
-    */
-
-    if (r.role) {
-
-      admin.role = r.role;
-
-    }
-
-
-    const apps =
-      r.applications || [];
-
+    const apps = r.applications || [];
 
     if (!apps.length) {
-
       rows.innerHTML =
-        "<tr><td colspan='9'>" +
-        "No applications found." +
-        "</td></tr>";
+        "<tr><td colspan='9'>No applications found.</td></tr>";
 
       msg.style.display = "none";
-
       return;
-
     }
-
 
     rows.innerHTML = "";
 
+    apps.forEach(app => {
+      const tr = document.createElement("tr");
 
-    apps.forEach(function(app) {
-
-      const tr =
-        document.createElement("tr");
-
-
-      /* APPLICATION */
-
-      const application =
-        document.createElement("td");
+      const application = document.createElement("td");
 
       application.innerHTML =
-        escapeHtml(
-          app.applicationId || ""
-        ) +
+        escapeHtml(app.applicationId || "") +
         "<br>" +
-        escapeHtml(
-          app.memberId || ""
-        );
+        escapeHtml(app.memberId || "");
 
+      const name = document.createElement("td");
+      name.textContent = app.name || "";
 
-      /* NAME */
+      const mobile = document.createElement("td");
+      mobile.textContent = app.mobile || "";
 
-      const name =
-        document.createElement("td");
+      const state = document.createElement("td");
+      state.textContent = app.state || "";
 
-      name.textContent =
-        app.name || "";
+      const mandal = document.createElement("td");
+      mandal.textContent = app.mandal || "";
 
+      const district = document.createElement("td");
+      district.textContent = app.district || "";
 
-      /* MOBILE */
+      const status = document.createElement("td");
+      status.textContent = app.status || "";
 
-      const mobile =
-        document.createElement("td");
-
-      mobile.textContent =
-        app.mobile || "";
-
-
-      /* STATE */
-
-      const state =
-        document.createElement("td");
-
-      state.textContent =
-        app.state || "";
-
-
-      /* MANDAL */
-
-      const mandal =
-        document.createElement("td");
-
-      mandal.textContent =
-        app.mandal || "";
-
-
-      /* DISTRICT */
-
-      const district =
-        document.createElement("td");
-
-      district.textContent =
-        app.district || "";
-
-
-      /* STATUS */
-
-      const status =
-        document.createElement("td");
-
-      status.textContent =
-        app.status || "";
-
-
-      /* POST */
-
-      const post =
-        document.createElement("td");
-
-
-      const currentPost =
-        String(
-          app.post || "सदस्य"
-        );
-
+      const post = document.createElement("td");
 
       if (
-        String(app.status || "")
-        .toUpperCase() === "APPROVED"
+        String(app.status || "").toUpperCase() ===
+        "APPROVED"
       ) {
-
-        const select =
-          document.createElement("select");
-
-        select.style.minWidth =
-          "180px";
-
-        select.innerHTML =
-          postOptions(currentPost);
-
-
-        /*
-           Higher level post होने पर
-           dropdown disabled रहेगा।
-        */
-
-        if (!canChangePost(currentPost)) {
-
-          select.disabled = true;
-
-        }
-
+        const select = document.createElement("select");
 
         select.id =
           "post_" +
-          app.applicationId;
+          String(app.applicationId || "").replace(
+            /[^a-zA-Z0-9_-]/g,
+            "_"
+          );
 
+        select.innerHTML =
+          postOptions(app.post || "सदस्य");
+
+        if (
+          app.post &&
+          !canChangePost(app.post)
+        ) {
+          select.disabled = true;
+        }
 
         post.appendChild(select);
 
-
       } else {
-
-        post.textContent = "—";
-
+        post.textContent = app.post || "—";
       }
 
-
-      /* ACTION */
-
-      const action =
-        document.createElement("td");
-
+      const action = document.createElement("td");
 
       if (
-        String(app.status || "")
-        .toUpperCase() === "PENDING"
+        String(app.status || "").toUpperCase() ===
+        "PENDING"
       ) {
-
-        const approve =
-          document.createElement("button");
+        const approve = document.createElement("button");
 
         approve.type = "button";
+        approve.className = "btn red";
+        approve.textContent = "APPROVE";
+        approve.onclick = () =>
+          act(app.applicationId, "approve");
 
-        approve.className =
-          "btn red";
-
-        approve.textContent =
-          "APPROVE";
-
-        approve.onclick =
-          function() {
-
-            act(
-              app.applicationId,
-              "approve"
-            );
-
-          };
-
-
-        const reject =
-          document.createElement("button");
+        const reject = document.createElement("button");
 
         reject.type = "button";
-
-        reject.className =
-          "btn";
-
-        reject.textContent =
-          "REJECT";
-
-        reject.style.marginLeft =
-          "6px";
-
-        reject.onclick =
-          function() {
-
-            act(
-              app.applicationId,
-              "reject"
-            );
-
-          };
-
+        reject.className = "btn";
+        reject.textContent = "REJECT";
+        reject.style.marginLeft = "6px";
+        reject.onclick = () =>
+          act(app.applicationId, "reject");
 
         action.appendChild(approve);
-
         action.appendChild(reject);
 
-      }
-
-
-      else if (
-        String(app.status || "")
-        .toUpperCase() === "APPROVED"
+      } else if (
+        String(app.status || "").toUpperCase() ===
+        "APPROVED"
       ) {
 
-        const save =
-          document.createElement("button");
+        if (canChangePost(app.post || "")) {
+          const save = document.createElement("button");
 
-        save.type = "button";
+          save.type = "button";
+          save.className = "btn red";
+          save.textContent = "SAVE POST";
 
-        save.className =
-          "btn red";
+          save.onclick = () =>
+            savePost(app.applicationId);
 
-        save.textContent =
-          "SAVE POST";
+          action.appendChild(save);
 
-
-        if (!canChangePost(currentPost)) {
-
-          save.disabled = true;
-
-          save.title =
-            "Higher level Admin ka Post hai.";
-
+        } else {
+          action.textContent =
+            "Higher Level Post";
         }
 
-
-        save.onclick =
-          function() {
-
-            savePost(
-              app.applicationId,
-              currentPost
-            );
-
-          };
-
-
-        action.appendChild(save);
-
+      } else {
+        action.textContent = "—";
       }
-
-
-      else {
-
-        action.textContent =
-          "—";
-
-      }
-
 
       tr.append(
         application,
@@ -939,169 +636,21 @@ async function loadApps() {
         action
       );
 
-
       rows.appendChild(tr);
-
     });
-
 
     msg.style.display = "none";
 
-
   } catch (err) {
-
     showMessage(
       msg,
-      err.message ||
-      "Applications load failed.",
+      err.message || "Applications load failed.",
       false
     );
-
 
     rows.innerHTML =
-      "<tr><td colspan='9'>" +
-      "Error loading applications." +
-      "</td></tr>";
-
+      "<tr><td colspan='9'>Error loading applications.</td></tr>";
   }
-
-}
-
-
-/* =========================================================
-   SAVE POST
-   ========================================================= */
-
-async function savePost(
-  applicationId,
-  originalPost
-) {
-
-  const select =
-    document.getElementById(
-      "post_" + applicationId
-    );
-
-
-  if (!select) return;
-
-
-  if (select.disabled) {
-
-    return;
-
-  }
-
-
-  const post =
-    String(
-      select.value || ""
-    ).trim();
-
-
-  if (!post) {
-
-    alert("Post select karo.");
-
-    return;
-
-  }
-
-
-  if (!confirm(
-    "Is member ko \"" +
-    post +
-    "\" post deni hai?"
-  )) {
-
-    return;
-
-  }
-
-
-  const msg =
-    document.getElementById(
-      "panelMsg"
-    );
-
-
-  showMessage(
-    msg,
-    "Post save ho rahi hai...",
-    true
-  );
-
-
-  try {
-
-    const r = await api({
-
-      action: "setPost",
-
-      applicationId:
-        applicationId,
-
-      post: post,
-
-      adminId:
-        admin.adminId,
-
-      password:
-        admin.password
-
-    });
-
-
-    if (!r.success) {
-
-      showMessage(
-        msg,
-        r.message ||
-        "Post save nahi hui.",
-        false
-      );
-
-      return;
-
-    }
-
-
-    let text =
-      r.message ||
-      "Post successfully saved.";
-
-
-    if (
-      r.emailSent === true
-    ) {
-
-      text +=
-        " Appointment email sent.";
-
-    }
-
-
-    showMessage(
-      msg,
-      text,
-      true
-    );
-
-
-    await loadApps();
-
-
-  } catch (err) {
-
-    showMessage(
-      msg,
-      err.message ||
-      "Post save failed.",
-      false
-    );
-
-  }
-
 }
 
 
@@ -1109,97 +658,58 @@ async function savePost(
    APPROVE / REJECT
    ========================================================= */
 
-async function act(
-  applicationId,
-  type
-) {
-
+async function act(applicationId, type) {
   const action =
     type === "approve"
       ? "approve"
       : "reject";
 
-
   if (!confirm(
-
     action === "approve"
-
       ? "Is application ko APPROVE karna hai?"
-
       : "Is application ko REJECT karna hai?"
-
   )) return;
 
-
   const msg =
-    document.getElementById(
-      "panelMsg"
-    );
-
+    document.getElementById("panelMsg");
 
   showMessage(
-
     msg,
-
     action === "approve"
-
       ? "Application approve ho rahi hai..."
-
       : "Application reject ho rahi hai...",
-
     true
-
   );
 
-
   try {
-
     const r = await api({
-
       action: action,
-
-      applicationId:
-        applicationId,
-
-      adminId:
-        admin.adminId,
-
-      password:
-        admin.password
-
+      applicationId: applicationId,
+      adminId: admin.adminId,
+      password: admin.password
     });
 
-
     if (!r.success) {
-
       showMessage(
         msg,
-        r.message ||
-        "Action failed.",
+        r.message || "Action failed.",
         false
       );
-
       return;
-
     }
-
 
     let text =
       r.message ||
       "Action successful.";
 
-
     if (
       action === "approve" &&
       r.memberId
     ) {
-
       text +=
         " Member ID: " +
         r.memberId;
-
     }
-
 
     showMessage(
       msg,
@@ -1207,73 +717,993 @@ async function act(
       true
     );
 
-
     await loadApps();
 
-
   } catch (err) {
-
     showMessage(
       msg,
-      err.message ||
-      "Action failed.",
+      err.message || "Action failed.",
       false
     );
-
   }
-
 }
 
 
 /* =========================================================
-   REFRESH
+   SAVE POST
    ========================================================= */
 
-document
-.getElementById("refreshBtn")
-.onclick = loadApps;
+async function savePost(applicationId) {
+  const selectId =
+    "post_" +
+    String(applicationId || "").replace(
+      /[^a-zA-Z0-9_-]/g,
+      "_"
+    );
+
+  const select =
+    document.getElementById(selectId);
+
+  if (!select) return;
+
+  const post =
+    String(select.value || "").trim();
+
+  if (!post) {
+    showMessage(
+      document.getElementById("panelMsg"),
+      "Post select karo.",
+      false
+    );
+    return;
+  }
+
+  if (
+    !allowedPostsForAdmin(admin.role)
+      .includes(post)
+  ) {
+    showMessage(
+      document.getElementById("panelMsg"),
+      "Aapko is level ka Post dene ki permission nahi hai.",
+      false
+    );
+    return;
+  }
+
+  if (
+    !confirm(
+      "Is member ko '" +
+      post +
+      "' Post deni hai?"
+    )
+  ) return;
+
+  const msg =
+    document.getElementById("panelMsg");
+
+  showMessage(
+    msg,
+    "Post save ho rahi hai...",
+    true
+  );
+
+  try {
+    const r = await api({
+      action: "setPost",
+      applicationId: applicationId,
+      post: post,
+      adminId: admin.adminId,
+      password: admin.password
+    });
+
+    if (!r.success) {
+      showMessage(
+        msg,
+        r.message || "Post save failed.",
+        false
+      );
+      return;
+    }
+
+    let text =
+      r.message ||
+      "Post successfully saved.";
+
+    if (r.emailMessage) {
+      text += " " + r.emailMessage;
+    }
+
+    showMessage(
+      msg,
+      text,
+      true
+    );
+
+    await loadApps();
+
+  } catch (err) {
+    showMessage(
+      msg,
+      err.message || "Post save failed.",
+      false
+    );
+  }
+}
 
 
 /* =========================================================
-   LOGOUT
+   ADMIN MANAGEMENT PERMISSION
    ========================================================= */
 
-document
-.getElementById("logoutBtn")
-.onclick = function() {
+function canManageAdmins() {
+  return [
+    "MAIN",
+    "NATIONAL",
+    "STATE",
+    "MANDAL"
+  ].includes(
+    String(admin.role || "").toUpperCase()
+  );
+}
 
-  admin = {};
+function allowedAdminRoles() {
+  const r =
+    String(admin.role || "").toUpperCase();
+
+  if (r === "MAIN") {
+    return [
+      "NATIONAL",
+      "STATE",
+      "MANDAL",
+      "DISTRICT"
+    ];
+  }
+
+  if (r === "NATIONAL") {
+    return [
+      "STATE",
+      "MANDAL",
+      "DISTRICT"
+    ];
+  }
+
+  if (r === "STATE") {
+    return [
+      "MANDAL",
+      "DISTRICT"
+    ];
+  }
+
+  if (r === "MANDAL") {
+    return [
+      "DISTRICT"
+    ];
+  }
+
+  return [];
+}
 
 
-  document
-    .getElementById("panel")
-    .style.display = "none";
+/* =========================================================
+   ADMIN MANAGEMENT UI
+   ========================================================= */
+
+function setupAdminManagement() {
+  const box =
+    document.getElementById(
+      "adminManagement"
+    );
+
+  if (!canManageAdmins()) {
+    box.style.display = "none";
+    return;
+  }
+
+  box.style.display = "block";
+
+  const roleSelect =
+    document.getElementById("adminRole");
+
+  roleSelect.innerHTML =
+    '<option value="">Select Role</option>';
+
+  allowedAdminRoles().forEach(role => {
+    const option =
+      document.createElement("option");
+
+    option.value = role;
+    option.textContent =
+      roleText(role);
+
+    roleSelect.appendChild(option);
+  });
+
+  updateAdminLocationFields();
+}
 
 
-  document
-    .getElementById("loginBox")
-    .style.display = "block";
+/* =========================================================
+   LOCATIONS
+   ========================================================= */
+
+async function loadLocations() {
+  try {
+    const r = await api({
+      action: "getLocations"
+    });
+
+    if (!r.success) {
+      throw new Error(
+        r.message ||
+        "Locations load failed."
+      );
+    }
+
+    locations =
+      Array.isArray(r.locations)
+        ? r.locations
+        : [];
+
+    populateAdminStates();
+
+  } catch (err) {
+    showMessage(
+      document.getElementById("adminMsg"),
+      err.message ||
+      "Locations load failed.",
+      false
+    );
+  }
+}
+
+function populateAdminStates() {
+  const select =
+    document.getElementById(
+      "adminState"
+    );
+
+  const current =
+    String(select.value || "");
+
+  select.innerHTML =
+    '<option value="">Select State</option>';
+
+  const states = [];
+
+  locations.forEach(x => {
+    const state =
+      String(x.state || "").trim();
+
+    if (
+      state &&
+      !states.includes(state)
+    ) {
+      states.push(state);
+    }
+  });
+
+  states.sort((a,b) =>
+    a.localeCompare(
+      b,
+      "hi"
+    )
+  );
+
+  states.forEach(state => {
+    const option =
+      document.createElement("option");
+
+    option.value = state;
+    option.textContent = state;
+
+    select.appendChild(option);
+  });
+
+  if (current) {
+    select.value = current;
+  }
+
+  updateAdminLocationFields();
+}
+
+function populateAdminMandals() {
+  const state =
+    String(
+      document.getElementById(
+        "adminState"
+      ).value || ""
+    ).trim();
+
+  const select =
+    document.getElementById(
+      "adminMandal"
+    );
+
+  select.innerHTML =
+    '<option value="">Select Mandal</option>';
+
+  const mandals = [];
+
+  locations.forEach(x => {
+    if (
+      String(x.state || "").trim() ===
+      state
+    ) {
+      const mandal =
+        String(x.mandal || "").trim();
+
+      if (
+        mandal &&
+        !mandals.includes(mandal)
+      ) {
+        mandals.push(mandal);
+      }
+    }
+  });
+
+  mandals.sort((a,b) =>
+    a.localeCompare(
+      b,
+      "hi"
+    )
+  );
+
+  mandals.forEach(mandal => {
+    const option =
+      document.createElement("option");
+
+    option.value = mandal;
+    option.textContent = mandal;
+
+    select.appendChild(option);
+  });
+
+  select.disabled = !state;
+
+  populateAdminDistricts();
+}
+
+function populateAdminDistricts() {
+  const state =
+    String(
+      document.getElementById(
+        "adminState"
+      ).value || ""
+    ).trim();
+
+  const mandal =
+    String(
+      document.getElementById(
+        "adminMandal"
+      ).value || ""
+    ).trim();
+
+  const select =
+    document.getElementById(
+      "adminDistrict"
+    );
+
+  select.innerHTML =
+    '<option value="">Select District</option>';
+
+  const districts = [];
+
+  locations.forEach(x => {
+    if (
+      String(x.state || "").trim() ===
+      state &&
+      String(x.mandal || "").trim() ===
+      mandal
+    ) {
+      const district =
+        String(x.district || "").trim();
+
+      if (
+        district &&
+        !districts.includes(district)
+      ) {
+        districts.push(district);
+      }
+    }
+  });
+
+  districts.sort((a,b) =>
+    a.localeCompare(
+      b,
+      "hi"
+    )
+  );
+
+  districts.forEach(district => {
+    const option =
+      document.createElement("option");
+
+    option.value = district;
+    option.textContent = district;
+
+    select.appendChild(option);
+  });
+
+  select.disabled =
+    !state ||
+    !mandal;
+}
+
+function updateAdminLocationFields() {
+  const role =
+    String(
+      document.getElementById(
+        "adminRole"
+      ).value || ""
+    ).toUpperCase();
+
+  const state =
+    document.getElementById(
+      "adminState"
+    );
+
+  const mandal =
+    document.getElementById(
+      "adminMandal"
+    );
+
+  const district =
+    document.getElementById(
+      "adminDistrict"
+    );
+
+  const needsState =
+    ["STATE","MANDAL","DISTRICT"]
+      .includes(role);
+
+  const needsMandal =
+    ["MANDAL","DISTRICT"]
+      .includes(role);
+
+  const needsDistrict =
+    role === "DISTRICT";
+
+  state.disabled =
+    !needsState;
+
+  mandal.disabled =
+    !needsMandal ||
+    !state.value;
+
+  district.disabled =
+    !needsDistrict ||
+    !state.value ||
+    !mandal.value;
+
+  if (!needsState) {
+    state.value = "";
+    mandal.value = "";
+    district.value = "";
+  } else {
+    populateAdminMandals();
+  }
+
+  if (!needsMandal) {
+    mandal.value = "";
+    district.value = "";
+  }
+
+  if (!needsDistrict) {
+    district.value = "";
+  }
+}
 
 
-  document
-    .getElementById("loginForm")
-    .reset();
+/* =========================================================
+   CREATE ADMIN
+   ========================================================= */
+
+document.getElementById(
+  "adminRole"
+).addEventListener(
+  "change",
+  updateAdminLocationFields
+);
+
+document.getElementById(
+  "adminState"
+).addEventListener(
+  "change",
+  function() {
+    populateAdminMandals();
+    updateAdminLocationFields();
+  }
+);
+
+document.getElementById(
+  "adminMandal"
+).addEventListener(
+  "change",
+  function() {
+    populateAdminDistricts();
+    updateAdminLocationFields();
+  }
+);
+
+document.getElementById(
+  "createAdminForm"
+).addEventListener(
+  "submit",
+  async function(e) {
+
+    e.preventDefault();
+
+    const form = e.target;
+
+    const msg =
+      document.getElementById(
+        "adminMsg"
+      );
+
+    const btn =
+      document.getElementById(
+        "createAdminBtn"
+      );
+
+    const role =
+      String(
+        form.elements.role.value || ""
+      ).trim()
+      .toUpperCase();
+
+    const state =
+      String(
+        form.elements.state.value || ""
+      ).trim();
+
+    const mandal =
+      String(
+        form.elements.mandal.value || ""
+      ).trim();
+
+    const district =
+      String(
+        form.elements.district.value || ""
+      ).trim();
+
+    if (
+      !allowedAdminRoles()
+        .includes(role)
+    ) {
+      showMessage(
+        msg,
+        "Aapko ye Admin role appoint karne ki permission nahi hai.",
+        false
+      );
+      return;
+    }
+
+    if (
+      ["STATE","MANDAL","DISTRICT"]
+        .includes(role) &&
+      !state
+    ) {
+      showMessage(
+        msg,
+        "State select karo.",
+        false
+      );
+      return;
+    }
+
+    if (
+      ["MANDAL","DISTRICT"]
+        .includes(role) &&
+      !mandal
+    ) {
+      showMessage(
+        msg,
+        "Mandal select karo.",
+        false
+      );
+      return;
+    }
+
+    if (
+      role === "DISTRICT" &&
+      !district
+    ) {
+      showMessage(
+        msg,
+        "District select karo.",
+        false
+      );
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent =
+      "APPOINTING...";
+
+    try {
+      const r = await api({
+        action: "createAdmin",
+
+        adminId:
+          admin.adminId,
+
+        password:
+          admin.password,
+
+        newAdminId:
+          String(
+            form.elements.newAdminId.value ||
+            ""
+          ).trim(),
+
+        newPassword:
+          String(
+            form.elements.newPassword.value ||
+            ""
+          ),
+
+        adminEmail:
+          String(
+            form.elements.adminEmail.value ||
+            ""
+          ).trim(),
+
+        role:
+          role,
+
+        state:
+          state,
+
+        mandal:
+          mandal,
+
+        district:
+          district
+      });
+
+      if (!r.success) {
+        showMessage(
+          msg,
+          r.message ||
+          "Admin appointment failed.",
+          false
+        );
+        return;
+      }
+
+      let text =
+        r.message ||
+        "Admin successfully appointed.";
+
+      if (r.emailMessage) {
+        text +=
+          " " +
+          r.emailMessage;
+      }
+
+      showMessage(
+        msg,
+        text,
+        true
+      );
+
+      form.reset();
+
+      updateAdminLocationFields();
+
+      await loadAdmins();
+
+    } catch (err) {
+      showMessage(
+        msg,
+        err.message ||
+        "Admin appointment failed.",
+        false
+      );
+    } finally {
+      btn.disabled = false;
+      btn.textContent =
+        "APPOINT ADMIN";
+    }
+  }
+);
 
 
-  document
-    .getElementById("rows")
-    .innerHTML =
-      "<tr><td colspan='9'>" +
-      "Applications load karne ke liye login karein." +
-      "</td></tr>";
+/* =========================================================
+   ADMIN LIST
+   ========================================================= */
+
+async function loadAdmins() {
+  if (!canManageAdmins()) return;
+
+  const rows =
+    document.getElementById(
+      "adminRows"
+    );
+
+  const msg =
+    document.getElementById(
+      "adminMsg"
+    );
+
+  rows.innerHTML =
+    "<tr><td colspan='8'>Loading admins...</td></tr>";
+
+  try {
+    const r = await api({
+      action: "listAdmins",
+      adminId: admin.adminId,
+      password: admin.password
+    });
+
+    if (!r.success) {
+      showMessage(
+        msg,
+        r.message ||
+        "Admin list load nahi hui.",
+        false
+      );
+
+      rows.innerHTML =
+        "<tr><td colspan='8'>Unable to load admins.</td></tr>";
+
+      return;
+    }
+
+    const admins =
+      r.admins || [];
+
+    if (!admins.length) {
+      rows.innerHTML =
+        "<tr><td colspan='8'>No admins found.</td></tr>";
+
+      return;
+    }
+
+    rows.innerHTML = "";
+
+    admins.forEach(item => {
+
+      const tr =
+        document.createElement("tr");
+
+      const id =
+        document.createElement("td");
+
+      id.textContent =
+        item.adminId || "";
+
+      const email =
+        document.createElement("td");
+
+      email.textContent =
+        item.email || "";
+
+      const role =
+        document.createElement("td");
+
+      role.textContent =
+        roleText(item.role);
+
+      const state =
+        document.createElement("td");
+
+      state.textContent =
+        item.state || "—";
+
+      const mandal =
+        document.createElement("td");
+
+      mandal.textContent =
+        item.mandal || "—";
+
+      const district =
+        document.createElement("td");
+
+      district.textContent =
+        item.district || "—";
+
+      const status =
+        document.createElement("td");
+
+      status.textContent =
+        item.status || "";
+
+      const action =
+        document.createElement("td");
+
+      const active =
+        String(
+          item.status || ""
+        ).toUpperCase() !==
+        "INACTIVE";
+
+      if (active) {
+
+        const btn =
+          document.createElement("button");
+
+        btn.type = "button";
+        btn.className = "btn";
+        btn.textContent =
+          "DEACTIVATE";
+
+        btn.onclick = () =>
+          deactivateAdmin(
+            item.adminId
+          );
+
+        action.appendChild(btn);
+
+      } else {
+        action.textContent =
+          "—";
+      }
+
+      tr.append(
+        id,
+        email,
+        role,
+        state,
+        mandal,
+        district,
+        status,
+        action
+      );
+
+      rows.appendChild(tr);
+    });
+
+  } catch (err) {
+    showMessage(
+      msg,
+      err.message ||
+      "Admin list load failed.",
+      false
+    );
+
+    rows.innerHTML =
+      "<tr><td colspan='8'>Error loading admins.</td></tr>";
+  }
+}
 
 
-  document
-    .getElementById("panelMsg")
-    .style.display = "none";
+/* =========================================================
+   DEACTIVATE ADMIN
+   ========================================================= */
 
+async function deactivateAdmin(
+  targetAdminId
+) {
+
+  if (
+    !confirm(
+      "Kya aap '" +
+      targetAdminId +
+      "' ko deactivate karna chahte hain?"
+    )
+  ) return;
+
+  const msg =
+    document.getElementById(
+      "adminMsg"
+    );
+
+  showMessage(
+    msg,
+    "Admin deactivate ho raha hai...",
+    true
+  );
+
+  try {
+    const r = await api({
+      action: "deactivateAdmin",
+
+      adminId:
+        admin.adminId,
+
+      password:
+        admin.password,
+
+      targetAdminId:
+        targetAdminId
+    });
+
+    if (!r.success) {
+      showMessage(
+        msg,
+        r.message ||
+        "Admin deactivate failed.",
+        false
+      );
+      return;
+    }
+
+    showMessage(
+      msg,
+      r.message ||
+      "Admin successfully deactivated.",
+      true
+    );
+
+    await loadAdmins();
+
+  } catch (err) {
+    showMessage(
+      msg,
+      err.message ||
+      "Admin deactivate failed.",
+      false
+    );
+  }
+}
+
+
+/* =========================================================
+   REFRESH / LOGOUT
+   ========================================================= */
+
+document.getElementById(
+  "refreshBtn"
+).onclick = loadApps;
+
+document.getElementById(
+  "refreshAdminsBtn"
+).onclick = async function() {
+  await loadAdmins();
 };
 
+document.getElementById(
+  "logoutBtn"
+).onclick = function() {
+
+  admin = {};
+  locations = [];
+
+  document.getElementById(
+    "panel"
+  ).style.display = "none";
+
+  document.getElementById(
+    "loginBox"
+  ).style.display = "block";
+
+  document.getElementById(
+    "loginForm"
+  ).reset();
+
+  document.getElementById(
+    "rows"
+  ).innerHTML =
+    "<tr><td colspan='9'>Applications load karne ke liye login karein.</td></tr>";
+
+  document.getElementById(
+    "adminRows"
+  ).innerHTML =
+    "<tr><td colspan='8'>Admin list load karne ke liye refresh karein.</td></tr>";
+
+  document.getElementById(
+    "panelMsg"
+  ).style.display = "none";
+
+  document.getElementById(
+    "adminMsg"
+  ).style.display = "none";
+};
+
+
+/* =========================================================
+   HTML ESCAPE
+   ========================================================= */
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
 </script>
 
 </body>
