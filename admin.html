@@ -25,6 +25,53 @@ body{background:var(--rs-bg)!important;color:var(--rs-ink)}
 @media(max-width:1050px){.rs-layout{grid-template-columns:190px minmax(0,1fr);gap:14px}.rs-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.rs-card{padding:14px}}
 @media(max-width:720px){.rs-topbar{padding:13px 15px;border-radius:12px}.rs-brand{font-size:17px}.rs-logo{width:36px;height:36px}.rs-layout{grid-template-columns:1fr}.rs-sidebar{position:static;padding:9px;overflow:auto}.rs-nav{flex-direction:row;min-width:max-content}.rs-side-label{display:none}.rs-nav button{width:auto;padding:10px 12px}.rs-nav button span:last-child{font-size:12px}.rs-stats{gap:9px}.rs-stat{padding:13px}.rs-stat-number{font-size:25px}.rs-pagehead h2{font-size:22px}.rs-card{padding:12px}.rs-topright .rs-userpill{display:none}}
 @media(max-width:390px){.rs-stats{grid-template-columns:1fr 1fr}.rs-stat-top{font-size:11px}.rs-stat-icon{width:29px;height:29px}}
+
+
+.rs-dashboard-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}.rs-status-bars{display:flex;flex-direction:column;gap:17px;margin-top:20px}.rs-bar-row{display:grid;grid-template-columns:75px minmax(0,1fr) 30px;gap:10px;align-items:center;font-size:12px;color:#9bb0ca}.rs-bar-row b{color:#e5eef9;text-align:right}.rs-bar-track{height:9px;border-radius:99px;background:#1b3049;overflow:hidden}.rs-bar-track i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#05aeca,#12d5df)}@media(max-width:900px){.rs-dashboard-grid{grid-template-columns:1fr}}
+
+/* ===== RastriyaSenaa Dark Navy Dashboard Theme ===== */
+:root{--rs-bg:#071426;--rs-ink:#e7eef8;--rs-muted:#8fa4bf;--rs-line:#20324c;--rs-teal:#0b1b31;--rs-teal2:#12385a;--rs-gold:#f4bd22}
+html,body{background:#071426!important;color:#e7eef8!important}
+body{background:radial-gradient(ellipse at 15% 0%,#102744 0%,#071426 48%,#050d19 100%)!important;min-height:100vh}
+main,.section,.container{background:transparent!important;color:#e7eef8!important}
+.head{color:#e7eef8!important}.head h2{color:#f3f7ff!important}.head p{color:#8fa4bf!important}
+#loginBox{background:#0e1d32!important;border:1px solid #243a58!important;color:#e7eef8!important;box-shadow:0 18px 45px #0005!important}
+#loginBox label{color:#d6e2f1!important}#loginBox input{background:#09172a!important;color:#edf5ff!important;border:1px solid #2b4260!important}
+.rs-topbar{background:#0b1b31!important;border:1px solid #20334e!important;border-radius:14px!important;box-shadow:0 10px 30px #0003!important}
+.rs-logo{background:#04b8d4!important;color:#041322!important;border-radius:10px!important}
+.rs-brand{color:#f3f7ff!important}.rs-userpill{background:#102641!important;border-color:#294461!important;color:#dce9f8!important}
+.rs-layout{grid-template-columns:76px minmax(0,1fr)!important;gap:18px!important}
+.rs-sidebar{background:#0b1b31!important;border:1px solid #20334e!important;border-radius:14px!important;padding:12px 9px!important;box-shadow:0 10px 28px #0003!important;min-height:calc(100vh - 145px)!important}
+.rs-side-label{font-size:9px!important;letter-spacing:1px!important;padding:8px 2px 12px!important;text-align:center!important;color:#7189a7!important}
+.rs-nav{gap:8px!important}.rs-nav button{justify-content:center!important;padding:12px 7px!important;color:#91a8c4!important;border-radius:11px!important;min-height:44px!important;gap:0!important;font-size:0!important}
+.rs-nav button span:last-child{display:none!important}.rs-nav .rs-nav-icon{font-size:20px!important;width:auto!important}
+.rs-nav button:hover{background:#132b47!important;color:#fff!important}.rs-nav button.active{background:#08aeca!important;color:#041322!important;box-shadow:0 5px 18px #00b6d433!important}
+.rs-note{background:#10243c!important;border-color:#263e5c!important;color:#9bb0ca!important}
+.rs-pagehead h2{color:#f2f6ff!important}.rs-crumb{color:#7f96b4!important}
+.rs-welcome{background:linear-gradient(120deg,#0d213a,#102d4b)!important;border:1px solid #263e5c!important;color:#f2f6ff!important;box-shadow:0 8px 24px #0002!important}.rs-welcome h3{color:#f2f6ff!important}.rs-welcome p{color:#9db4d0!important}
+.rs-stats{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important}
+.rs-stat,.rs-card,.card.rs-card{background:#0e1e33!important;border:1px solid #203652!important;border-radius:13px!important;color:#e7eef8!important;box-shadow:0 8px 24px #0002!important}
+.rs-stat{padding:16px!important}.rs-stat-top{color:#91a6c1!important}.rs-stat-icon{background:#10334a!important;color:#08c1dc!important}.rs-stat-number{color:#f1f6ff!important}.rs-stat-note{color:#7890ae!important}
+.rs-card h3,.rs-card h4{color:#eaf2ff!important}.rs-card p{color:#8fa4bf!important}
+.rs-card .tablewrap{border-color:#203652!important;background:#0a1729!important}
+.rs-card .table{background:#0e1e33!important;color:#dce7f5!important}
+.rs-card .table th{background:#132740!important;color:#a9bed7!important;border-color:#263b57!important}
+.rs-card .table td{background:#0e1e33!important;color:#d5e1f0!important;border-color:#1c304a!important}
+.rs-card .table tr:hover td{background:#132740!important}
+#appTableControls input,#appTableControls select,.rs-card input,.rs-card select{background:#09172a!important;color:#e5eef9!important;border:1px solid #2a4260!important}
+#appTableControls input::placeholder{color:#6f86a4!important}
+.rs-quick button{background:#12314e!important;color:#dff8ff!important;border:1px solid #2b4c6d!important}.rs-quick button:hover{background:#0a9bb7!important;color:#041322!important}
+.btn{background:#18314e!important;color:#e5effc!important;border:1px solid #2d4664!important}.btn.red{background:#05aeca!important;color:#041522!important;border:1px solid #05aeca!important;font-weight:800}.btn:hover{filter:brightness(1.1)}
+.msg.success{background:#0e382f!important;color:#8af0c4!important;border-color:#1a7157!important}.msg.error{background:#421f2c!important;color:#ffb6c2!important;border-color:#783348!important}
+#adminManagement{background:#0e1e33!important;color:#e7eef8!important;border-color:#203652!important}
+#adminManagement .form{background:#0a192b!important;border-color:#233b58!important;color:#e7eef8!important}
+#adminManagement label{color:#c8d7e9!important}#adminManagement input,#adminManagement select{background:#09172a!important;color:#e5eef9!important;border-color:#2a4260!important}
+#memberDetailsModal>div{background:#0e1e33!important;color:#e7eef8!important;border:1px solid #2a4260!important}#memberDetailsModal .table th{background:#132740!important;color:#c9d9eb!important}#memberDetailsModal .table td{background:#0e1e33!important;color:#dce7f5!important}
+#rsLogoutTop{background:#12314e!important;color:#dff8ff!important;border:1px solid #2b4c6d!important}
+@media(max-width:1050px){.rs-layout{grid-template-columns:66px minmax(0,1fr)!important}.rs-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:720px){.rs-layout{grid-template-columns:1fr!important}.rs-sidebar{min-height:0!important;padding:8px!important}.rs-nav{flex-direction:row!important;min-width:0!important;justify-content:space-around!important}.rs-nav button{flex:1!important;min-width:42px!important;padding:10px 6px!important}.rs-nav button span:last-child{display:none!important}.rs-side-label{display:none!important}.rs-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.rs-topbar{margin-top:6px!important}.rs-content{min-width:0!important}}
+@media(max-width:390px){.rs-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.rs-stat{padding:11px!important}.rs-stat-number{font-size:23px!important}}
+
 </style>
 </head>
 
@@ -92,7 +139,11 @@ body{background:var(--rs-bg)!important;color:var(--rs-ink)}
         <div class="rs-stat"><div class="rs-stat-top"><span>Approved</span><span class="rs-stat-icon">✓</span></div><div class="rs-stat-number" id="rsApprovedCount">—</div><div class="rs-stat-note">Approved members</div></div>
         <div class="rs-stat"><div class="rs-stat-top"><span>Rejected</span><span class="rs-stat-icon">!</span></div><div class="rs-stat-number" id="rsRejectedCount">—</div><div class="rs-stat-note">Rejected applications</div></div>
       </div>
-      <div class="rs-card"><h3>Quick Actions</h3><p style="color:#71808c">Choose an area to continue managing the organization.</p><div class="rs-quick"><button type="button" data-rs-view="members">Review Applications</button><button type="button" data-rs-view="posts">Manage Member Posts</button></div></div>
+      <div class="rs-dashboard-grid">
+        <div class="rs-card"><h3>Application Overview</h3><p>Current status distribution from your member records.</p><div id="rsStatusBars" class="rs-status-bars"><div class="rs-bar-row"><span>Pending</span><div class="rs-bar-track"><i style="width:0%"></i></div><b>—</b></div><div class="rs-bar-row"><span>Approved</span><div class="rs-bar-track"><i style="width:0%"></i></div><b>—</b></div><div class="rs-bar-row"><span>Rejected</span><div class="rs-bar-track"><i style="width:0%"></i></div><b>—</b></div></div></div>
+        <div class="rs-card"><h3>Recent Applications</h3><p>Latest applications returned by the existing backend.</p><div class="tablewrap"><table class="table"><thead><tr><th>Name</th><th>Member ID</th><th>Status</th></tr></thead><tbody id="rsRecentRows"><tr><td colspan="3">Login to load applications.</td></tr></tbody></table></div><button type="button" class="btn red" data-rs-view="members" style="margin-top:12px">View All Members →</button></div>
+      </div>
+      <div class="rs-card"><h3>Quick Actions</h3><p>Choose an area to continue managing the organization.</p><div class="rs-quick"><button type="button" data-rs-view="members">Review Applications</button><button type="button" data-rs-view="posts">Manage Member Posts</button></div></div>
     </section>
     <section id="rsPostsView" class="rs-view" style="display:none">
       <div class="rs-pagehead"><div><h2>Posts & Permissions</h2><div class="rs-crumb">Home › Organizational roles</div></div></div>
@@ -3432,7 +3483,8 @@ function showRsView(view) {
 }
 function updateRsDashboard(apps) {
   const list = Array.isArray(apps) ? apps : [];
-  const count = status => list.filter(x => String(x.status || "").toUpperCase() === status).length;
+  const statusOf = x => String(x.status || "").toUpperCase();
+  const count = status => list.filter(x => statusOf(x) === status).length;
   const values = {
     rsTotalCount: list.length,
     rsPendingCount: count("PENDING"),
@@ -3440,6 +3492,28 @@ function updateRsDashboard(apps) {
     rsRejectedCount: count("REJECTED")
   };
   Object.keys(values).forEach(id => { const el = document.getElementById(id); if (el) el.textContent = String(values[id]); });
+  const bars = document.getElementById("rsStatusBars");
+  if (bars) {
+    const total = Math.max(list.length, 1);
+    const entries = [
+      ["Pending", values.rsPendingCount, "#e8ad34"],
+      ["Approved", values.rsApprovedCount, "#08b985"],
+      ["Rejected", values.rsRejectedCount, "#f05c72"]
+    ];
+    bars.innerHTML = entries.map(([label, n, color]) => `<div class="rs-bar-row"><span>${label}</span><div class="rs-bar-track"><i style="width:${Math.round(n/total*100)}%;background:${color}"></i></div><b>${n}</b></div>`).join("");
+  }
+  const recent = document.getElementById("rsRecentRows");
+  if (recent) {
+    const newest = list.slice().reverse().slice(0, 5);
+    recent.innerHTML = newest.length ? "" : '<tr><td colspan="3">No applications found.</td></tr>';
+    newest.forEach(item => {
+      const tr = document.createElement("tr");
+      const name = document.createElement("td"); name.textContent = item.name || "—";
+      const member = document.createElement("td"); member.textContent = item.memberId || "—";
+      const status = document.createElement("td"); status.textContent = item.status || "—";
+      tr.append(name, member, status); recent.appendChild(tr);
+    });
+  }
 }
 document.querySelectorAll("[data-rs-view]").forEach(btn => {
   btn.addEventListener("click", () => showRsView(btn.getAttribute("data-rs-view")));
