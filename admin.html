@@ -5,6 +5,27 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Admin Panel | RashtriyaSenaa</title>
 <link rel="stylesheet" href="styles.css">
+<style>
+:root{--rs-teal:#073f3b;--rs-teal2:#0b5a52;--rs-gold:#f4bd22;--rs-bg:#f3f6f8;--rs-ink:#172b35;--rs-muted:#71808c;--rs-line:#e3eaf0}
+body{background:var(--rs-bg)!important;color:var(--rs-ink)}
+#panel{width:100%;max-width:1600px;margin:0 auto}
+.rs-topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;background:var(--rs-teal);color:#fff;padding:17px 24px;border-radius:16px;margin:10px 0 22px;box-shadow:0 8px 22px #073f3b18}
+.rs-brand{display:flex;align-items:center;gap:12px;font-size:21px;font-weight:800;letter-spacing:.2px}.rs-logo{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:#fff;color:var(--rs-teal);font-size:22px}
+.rs-topright{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.rs-userpill{border:1px solid #ffffff38;border-radius:999px;padding:8px 13px;font-size:13px}
+.rs-layout{display:grid;grid-template-columns:238px minmax(0,1fr);gap:22px;align-items:start}
+.rs-sidebar{background:#fff;border:1px solid var(--rs-line);border-radius:16px;padding:16px 12px;position:sticky;top:16px;box-shadow:0 5px 18px #1b354208}
+.rs-side-label{font-size:10px;font-weight:800;letter-spacing:1.4px;color:#91a0aa;padding:9px 12px 12px;text-transform:uppercase}
+.rs-nav{display:flex;flex-direction:column;gap:5px}.rs-nav button{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;background:transparent;color:#526572;border-radius:10px;padding:12px;font:600 14px inherit;cursor:pointer;transition:.15s}.rs-nav button:hover{background:#eff7f6;color:var(--rs-teal)}.rs-nav button.active{background:var(--rs-teal);color:#fff;box-shadow:0 5px 12px #073f3b20}.rs-nav .rs-nav-icon{width:22px;text-align:center;font-size:17px}
+.rs-content{min-width:0}.rs-pagehead{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin:3px 0 18px}.rs-pagehead h2{font-size:26px;margin:0 0 5px;color:#142c34}.rs-crumb{font-size:13px;color:var(--rs-muted)}
+.rs-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}.rs-stat{background:#fff;border:1px solid var(--rs-line);border-radius:14px;padding:18px;min-width:0;box-shadow:0 5px 18px #1b354205}.rs-stat-top{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#6c7d88;font-size:13px}.rs-stat-icon{display:grid;place-items:center;width:36px;height:36px;border-radius:11px;background:#eaf5f3;color:var(--rs-teal);font-size:18px}.rs-stat-number{font-size:30px;font-weight:800;line-height:1.2;margin-top:13px;color:#18333b}.rs-stat-note{font-size:12px;color:#8a98a1;margin-top:5px}
+.rs-card{background:#fff;border:1px solid var(--rs-line);border-radius:15px;padding:20px;box-shadow:0 5px 18px #1b354205;margin-bottom:18px;min-width:0}.rs-card h3{color:#19353c;margin-top:0}.rs-card .tablewrap{max-width:100%;overflow:auto;border:1px solid var(--rs-line);border-radius:10px}.rs-card .table{min-width:1150px}.rs-card .table th{background:#f6f9fa;color:#415560;white-space:nowrap}.rs-card .table td,.rs-card .table th{padding:12px 10px;border-color:var(--rs-line)}#appTableControls input,#appTableControls select{background:#fff!important;border:1px solid #dbe4e9!important;border-radius:9px!important;min-height:42px}#panelMsg,#adminMsg{margin:10px 0}
+.rs-welcome{background:linear-gradient(120deg,#073f3b,#0d6258);color:white;border-radius:15px;padding:22px;margin-bottom:16px}.rs-welcome h3{color:white;margin:0 0 6px}.rs-welcome p{margin:0;color:#d9eeeb;font-size:14px}.rs-quick{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}.rs-quick button{background:#fff;color:var(--rs-teal);border:0;border-radius:9px;padding:10px 14px;font-weight:700;cursor:pointer}
+.rs-note{padding:15px 16px;border-radius:11px;background:#f4f8f8;border:1px solid #deebea;color:#536973;font-size:14px;line-height:1.6}
+#loginBox{max-width:720px;margin:40px auto;background:#fff;border:1px solid var(--rs-line);border-radius:16px;padding:25px;box-shadow:0 12px 35px #12352b10}.head{text-align:left;max-width:1600px;margin:20px auto 18px}.head h2{font-size:28px;color:var(--rs-teal)}
+@media(max-width:1050px){.rs-layout{grid-template-columns:190px minmax(0,1fr);gap:14px}.rs-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.rs-card{padding:14px}}
+@media(max-width:720px){.rs-topbar{padding:13px 15px;border-radius:12px}.rs-brand{font-size:17px}.rs-logo{width:36px;height:36px}.rs-layout{grid-template-columns:1fr}.rs-sidebar{position:static;padding:9px;overflow:auto}.rs-nav{flex-direction:row;min-width:max-content}.rs-side-label{display:none}.rs-nav button{width:auto;padding:10px 12px}.rs-nav button span:last-child{font-size:12px}.rs-stats{gap:9px}.rs-stat{padding:13px}.rs-stat-number{font-size:25px}.rs-pagehead h2{font-size:22px}.rs-card{padding:12px}.rs-topright .rs-userpill{display:none}}
+@media(max-width:390px){.rs-stats{grid-template-columns:1fr 1fr}.rs-stat-top{font-size:11px}.rs-stat-icon{width:29px;height:29px}}
+</style>
 </head>
 
 <body>
@@ -45,9 +66,48 @@
 
 
 <div id="panel" style="display:none">
+<div class="rs-topbar">
+  <div class="rs-brand"><div class="rs-logo">✦</div><div>RastriyaSenaa<small style="display:block;font-size:10px;font-weight:600;letter-spacing:1.8px;opacity:.75;margin-top:2px">ADMIN PORTAL</small></div></div>
+  <div class="rs-topright"><span class="rs-userpill" id="rsSignedInAs">Administrator</span><button type="button" class="btn" id="rsLogoutTop" style="background:#fff;color:#073f3b;border:0">LOGOUT</button></div>
+</div>
+<div class="rs-layout">
+  <aside class="rs-sidebar">
+    <div class="rs-side-label">Workspace</div>
+    <nav class="rs-nav" aria-label="Admin navigation">
+      <button type="button" class="active" data-rs-view="dashboard"><span class="rs-nav-icon">▦</span><span>Dashboard</span></button>
+      <button type="button" data-rs-view="members"><span class="rs-nav-icon">♙</span><span>Members</span></button>
+      <button type="button" data-rs-view="admins" id="rsAdminNav"><span class="rs-nav-icon">♧</span><span>Admin Management</span></button>
+      <button type="button" data-rs-view="posts"><span class="rs-nav-icon">⚑</span><span>Posts & Permissions</span></button>
+      <button type="button" data-rs-view="settings"><span class="rs-nav-icon">⚙</span><span>Settings</span></button>
+    </nav>
+    <div class="rs-note" style="margin:18px 3px 3px;font-size:12px"><strong>Jai Bhim · Jai Samvidhan</strong><br>Manage members and organizational roles.</div>
+  </aside>
+  <div class="rs-content">
+    <section id="rsDashboardView" class="rs-view">
+      <div class="rs-pagehead"><div><h2>Dashboard</h2><div class="rs-crumb">Home › Overview</div></div><button type="button" class="btn red" id="rsDashRefresh">↻ Refresh Data</button></div>
+      <div class="rs-welcome"><h3>Welcome to RastriyaSenaa</h3><p>Organization membership and administration overview.</p><div class="rs-quick"><button type="button" data-rs-view="members">View Members →</button><button type="button" data-rs-view="admins" id="rsQuickAdmins">Manage Admins →</button></div></div>
+      <div class="rs-stats">
+        <div class="rs-stat"><div class="rs-stat-top"><span>Total Applications</span><span class="rs-stat-icon">♙</span></div><div class="rs-stat-number" id="rsTotalCount">—</div><div class="rs-stat-note">All submitted applications</div></div>
+        <div class="rs-stat"><div class="rs-stat-top"><span>Pending</span><span class="rs-stat-icon">◷</span></div><div class="rs-stat-number" id="rsPendingCount">—</div><div class="rs-stat-note">Awaiting review</div></div>
+        <div class="rs-stat"><div class="rs-stat-top"><span>Approved</span><span class="rs-stat-icon">✓</span></div><div class="rs-stat-number" id="rsApprovedCount">—</div><div class="rs-stat-note">Approved members</div></div>
+        <div class="rs-stat"><div class="rs-stat-top"><span>Rejected</span><span class="rs-stat-icon">!</span></div><div class="rs-stat-number" id="rsRejectedCount">—</div><div class="rs-stat-note">Rejected applications</div></div>
+      </div>
+      <div class="rs-card"><h3>Quick Actions</h3><p style="color:#71808c">Choose an area to continue managing the organization.</p><div class="rs-quick"><button type="button" data-rs-view="members">Review Applications</button><button type="button" data-rs-view="posts">Manage Member Posts</button></div></div>
+    </section>
+    <section id="rsPostsView" class="rs-view" style="display:none">
+      <div class="rs-pagehead"><div><h2>Posts & Permissions</h2><div class="rs-crumb">Home › Organizational roles</div></div></div>
+      <div class="rs-card"><h3>Member Posts</h3><p style="color:#71808c">पद बदलने और उपलब्ध permissions का मौजूदा विकल्प Members सूची में ही रखा गया है। किसी सदस्य का पद बदलने के लिए नीचे जाएँ।</p><button type="button" class="btn red" data-rs-view="members">Open Members & Posts →</button></div>
+      <div class="rs-card"><h3>Available Organizational Posts</h3><div class="rs-note">सदस्य · ब्लॉक · तहसील · जिला · मण्डल · प्रदेश · राष्ट्रीय स्तर के पद मौजूदा backend और permissions के अनुसार नियंत्रित होते हैं।</div></div>
+    </section>
+    <section id="rsSettingsView" class="rs-view" style="display:none">
+      <div class="rs-pagehead"><div><h2>Settings</h2><div class="rs-crumb">Home › Account</div></div></div>
+      <div class="rs-card"><h3>Current Session</h3><p>Signed-in Admin: <strong id="rsSettingsAdmin">—</strong></p><p>Role: <strong id="rsSettingsRole">—</strong></p><div class="rs-note">यहाँ मौजूदा लॉगिन और संगठनात्मक permissions का सार दिखाया गया है। Backend में उपलब्ध न होने वाली settings नहीं जोड़ी गई हैं।</div><div style="margin-top:16px"><button type="button" class="btn" id="rsLogoutSettings">LOGOUT</button></div></div>
+    </section>
+    <section id="rsMembersView" class="rs-view">
+      <div class="rs-pagehead"><div><h2>Members & Applications</h2><div class="rs-crumb">Home › Members</div></div><button type="button" class="btn red" id="rsMembersRefresh">↻ Refresh</button></div>
 
 <!-- APPLICATIONS -->
-<div class="card">
+<div class="card rs-card" id="membersSection">
 
 <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
 <h3>Applications</h3>
@@ -70,7 +130,6 @@
     <option value="REJECTED">Rejected</option>
   </select>
   <select id="appPageSize" aria-label="Rows per page" style="padding:10px;border:1px solid #ccc;border-radius:6px">
-    <option value="10">10 per page</option>
     <option value="20">20 per page</option>
     <option value="50">50 per page</option>
     <option value="100">100 per page</option>
@@ -141,7 +200,7 @@ CLOSE
 
 <!-- ADMIN MANAGEMENT -->
 <div id="adminManagement"
-class="card"
+class="card rs-card"
 style="display:none;margin-top:20px">
 
 <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
@@ -271,7 +330,9 @@ Admin list load karne ke liye refresh karein.
 </div>
 
 </div>
-
+    </section>
+  </div>
+</div>
 </div>
 
 </div>
@@ -724,6 +785,17 @@ document
 
 
       setupAdminManagement();
+      const signed = document.getElementById("rsSignedInAs");
+      const settingsAdmin = document.getElementById("rsSettingsAdmin");
+      const settingsRole = document.getElementById("rsSettingsRole");
+      if (signed) signed.textContent = admin.adminId || "Administrator";
+      if (settingsAdmin) settingsAdmin.textContent = admin.adminId || "—";
+      if (settingsRole) settingsRole.textContent = roleText(admin.role || "");
+      const adminNav = document.getElementById("rsAdminNav");
+      const quickAdmins = document.getElementById("rsQuickAdmins");
+      if (adminNav) adminNav.style.display = canManageAdmins() ? "flex" : "none";
+      if (quickAdmins) quickAdmins.style.display = canManageAdmins() ? "inline-block" : "none";
+      showRsView("dashboard");
 
       await loadApps();
 
@@ -810,7 +882,7 @@ async function loadApps() {
 
     const apps =
       r.applications || [];
-
+    updateRsDashboard(apps);
 
     if (!apps.length) {
 
@@ -3235,6 +3307,7 @@ document
   function() {
 
     admin = {};
+    ["rsTotalCount", "rsPendingCount", "rsApprovedCount", "rsRejectedCount"].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = "—"; });
 
     locations = [];
 
@@ -3330,6 +3403,55 @@ function escapeHtml(value) {
     );
 
 }
+
+
+
+/* RastriyaSenaa redesigned navigation: preserves existing API and handlers */
+function showRsView(view) {
+  const map = {
+    dashboard: document.getElementById("rsDashboardView"),
+    members: document.getElementById("rsMembersView"),
+    admins: document.getElementById("adminManagement"),
+    posts: document.getElementById("rsPostsView"),
+    settings: document.getElementById("rsSettingsView")
+  };
+  if (view === "admins" && typeof canManageAdmins === "function" && !canManageAdmins()) {
+    showMessage(document.getElementById("panelMsg"), "Aapko Admin Management ki permission nahi hai.", false);
+    return;
+  }
+  Object.keys(map).forEach(key => {
+    if (map[key]) map[key].style.display = key === view ? "block" : "none";
+  });
+  document.querySelectorAll("[data-rs-view]").forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-rs-view") === view);
+  });
+  const title = {dashboard:"Dashboard",members:"Members & Applications",admins:"Admin Management",posts:"Posts & Permissions",settings:"Settings"}[view] || "Dashboard";
+  const crumb = document.querySelector(".head p");
+  if (crumb) crumb.textContent = title + " · RastriyaSenaa Admin Portal";
+  if (view === "members") applyAppTableView();
+}
+function updateRsDashboard(apps) {
+  const list = Array.isArray(apps) ? apps : [];
+  const count = status => list.filter(x => String(x.status || "").toUpperCase() === status).length;
+  const values = {
+    rsTotalCount: list.length,
+    rsPendingCount: count("PENDING"),
+    rsApprovedCount: count("APPROVED"),
+    rsRejectedCount: count("REJECTED")
+  };
+  Object.keys(values).forEach(id => { const el = document.getElementById(id); if (el) el.textContent = String(values[id]); });
+}
+document.querySelectorAll("[data-rs-view]").forEach(btn => {
+  btn.addEventListener("click", () => showRsView(btn.getAttribute("data-rs-view")));
+});
+["rsDashRefresh", "rsMembersRefresh"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener("click", () => loadApps());
+});
+["rsLogoutTop", "rsLogoutSettings"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener("click", () => document.getElementById("logoutBtn").click());
+});
 
 </script>
 
