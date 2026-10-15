@@ -72,6 +72,36 @@ main,.section,.container{background:transparent!important;color:#e7eef8!importan
 @media(max-width:720px){.rs-layout{grid-template-columns:1fr!important}.rs-sidebar{min-height:0!important;padding:8px!important}.rs-nav{flex-direction:row!important;min-width:0!important;justify-content:space-around!important}.rs-nav button{flex:1!important;min-width:42px!important;padding:10px 6px!important}.rs-nav button span:last-child{display:none!important}.rs-side-label{display:none!important}.rs-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.rs-topbar{margin-top:6px!important}.rs-content{min-width:0!important}}
 @media(max-width:390px){.rs-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.rs-stat{padding:11px!important}.rs-stat-number{font-size:23px!important}}
 
+
+/* Layout fixes: keep the sidebar readable and prevent the organization note from overflowing */
+.rs-layout{grid-template-columns:235px minmax(0,1fr)!important;gap:18px!important}
+.rs-sidebar{width:auto!important;min-width:0!important;padding:14px 12px!important;overflow:hidden!important}
+.rs-side-label{text-align:left!important;padding:8px 12px 12px!important}
+.rs-nav{min-width:0!important}
+.rs-nav button{justify-content:flex-start!important;gap:11px!important;padding:12px!important;font-size:14px!important;min-width:0!important}
+.rs-nav button span:last-child{display:inline!important;white-space:normal!important;font-size:13px!important}
+.rs-nav .rs-nav-icon{width:22px!important;min-width:22px!important;text-align:center!important}
+.rs-note{overflow-wrap:anywhere!important;word-break:normal!important;margin-left:3px!important;margin-right:3px!important}
+.rs-content{min-width:0!important;width:100%!important}
+.rs-view{min-width:0!important}
+#adminManagement{width:100%!important;box-sizing:border-box!important;margin-top:0!important}
+#adminManagement .tablewrap{max-width:100%!important;overflow-x:auto!important}
+#adminManagement .formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:1050px){
+ .rs-layout{grid-template-columns:205px minmax(0,1fr)!important}
+ .rs-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:720px){
+ .rs-layout{grid-template-columns:minmax(0,1fr)!important}
+ .rs-sidebar{min-height:0!important;position:static!important}
+ .rs-nav{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
+ .rs-nav button{justify-content:flex-start!important;min-height:42px!important;padding:9px!important}
+ .rs-nav button span:last-child{display:inline!important;font-size:12px!important}
+ .rs-side-label{display:block!important;text-align:left!important}
+ .rs-note{display:none!important}
+ #adminManagement .formgrid{grid-template-columns:minmax(0,1fr)!important}
+}
+
 </style>
 </head>
 
@@ -796,6 +826,8 @@ document
           ) ||
           ""
         ).toUpperCase();
+      const signedAs = document.getElementById("rsSignedInAs");
+      if (signedAs) signedAs.textContent = admin.adminId;
 
 
       admin.state =
@@ -1896,22 +1928,19 @@ async function savePost(
    ========================================================= */
 
 function canManageAdmins() {
-
-  return [
-
-    "MAIN",
-    "NATIONAL",
-    "STATE",
-    "MANDAL"
-
-  ].includes(
-
-    String(
-      admin.role || ""
-    ).toUpperCase()
-
-  );
-
+  const raw = String(admin.role || "").trim().toUpperCase()
+    .replace(/[_-]+/g, " ")
+    .replace(/\\s+/g, " ");
+  const aliases = {
+    "MAIN ADMIN": "MAIN",
+    "SUPER ADMIN": "MAIN",
+    "NATIONAL ADMIN": "NATIONAL",
+    "STATE ADMIN": "STATE",
+    "MANDAL ADMIN": "MANDAL",
+    "DISTRICT ADMIN": "DISTRICT"
+  };
+  const role = aliases[raw] || raw;
+  return ["MAIN", "NATIONAL", "STATE", "MANDAL"].includes(role);
 }
 
 
@@ -3459,20 +3488,40 @@ function escapeHtml(value) {
 
 /* RastriyaSenaa redesigned navigation: preserves existing API and handlers */
 function showRsView(view) {
-  const map = {
+  // Admin Management lives inside the Members container in the legacy HTML.
+  // Keep that parent visible while showing only the Admin Management card.
+  const views = {
     dashboard: document.getElementById("rsDashboardView"),
     members: document.getElementById("rsMembersView"),
-    admins: document.getElementById("adminManagement"),
     posts: document.getElementById("rsPostsView"),
     settings: document.getElementById("rsSettingsView")
   };
   if (view === "admins" && typeof canManageAdmins === "function" && !canManageAdmins()) {
-    showMessage(document.getElementById("panelMsg"), "Aapko Admin Management ki permission nahi hai.", false);
+    Object.keys(views).forEach(key => {
+      if (views[key]) views[key].style.display = "none";
+    });
+    let denied = document.getElementById("rsAdminAccessNotice");
+    if (!denied) {
+      denied = document.createElement("section");
+      denied.id = "rsAdminAccessNotice";
+      denied.className = "rs-view rs-card";
+      denied.innerHTML = "<h2>Admin Management</h2><p>Your current admin role does not have permission to manage admins.</p><p>Please sign in with a Main, National, State, or Mandal Admin account, or ask the Main Admin to review your role.</p>";
+      const content = document.querySelector(".rs-content");
+      if (content) content.appendChild(denied);
+    }
+    denied.style.display = "block";
+    document.querySelectorAll("[data-rs-view]").forEach(btn => btn.classList.toggle("active", btn.getAttribute("data-rs-view") === view));
     return;
   }
-  Object.keys(map).forEach(key => {
-    if (map[key]) map[key].style.display = key === view ? "block" : "none";
+  const deniedNotice = document.getElementById("rsAdminAccessNotice");
+  if (deniedNotice) deniedNotice.style.display = "none";
+  Object.keys(views).forEach(key => {
+    if (views[key]) views[key].style.display = key === view || (view === "admins" && key === "members") ? "block" : "none";
   });
+  const membersSection = document.getElementById("membersSection");
+  const adminManagement = document.getElementById("adminManagement");
+  if (membersSection) membersSection.style.display = view === "admins" ? "none" : "block";
+  if (adminManagement) adminManagement.style.display = view === "admins" ? "block" : "none";
   document.querySelectorAll("[data-rs-view]").forEach(btn => {
     btn.classList.toggle("active", btn.getAttribute("data-rs-view") === view);
   });
@@ -3480,6 +3529,7 @@ function showRsView(view) {
   const crumb = document.querySelector(".head p");
   if (crumb) crumb.textContent = title + " · RastriyaSenaa Admin Portal";
   if (view === "members") applyAppTableView();
+  if (view === "admins" && typeof loadAdmins === "function") loadAdmins();
 }
 function updateRsDashboard(apps) {
   const list = Array.isArray(apps) ? apps : [];
