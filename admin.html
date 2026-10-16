@@ -211,8 +211,6 @@ main,.section,.container{background:transparent!important;color:#e7eef8!importan
     <option value="REJECTED">Rejected</option>
   </select>
   <select id="appPageSize" aria-label="Rows per page" style="padding:10px;border:1px solid #ccc;border-radius:6px">
-   <option value="5">5 per page</option>
-   <option value="10">10 per page</option>
     <option value="20">20 per page</option>
     <option value="50">50 per page</option>
     <option value="100">100 per page</option>
@@ -915,6 +913,37 @@ document
 
 
 /* =========================================================
+   PHOTO URL NORMALIZER
+   Google Drive view URLs are not always suitable as <img> sources.
+   ========================================================= */
+function getPhotoDisplayUrl(url) {
+  const raw = String(url || "").trim();
+  if (!raw) return "";
+  const match = raw.match(/(?:drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?(?:[^#]*&)?id=|thumbnail\?id=))([a-zA-Z0-9_-]+)/i)
+    || raw.match(/[?&]id=([a-zA-Z0-9_-]+)/i);
+  if (match && match[1]) {
+    return "https://drive.google.com/thumbnail?id=" + encodeURIComponent(match[1]) + "&sz=w400";
+  }
+  return raw;
+}
+
+function setPhotoFallback(img, originalUrl, fallbackLabel) {
+  const original = String(originalUrl || "").trim();
+  img.onerror = function () {
+    if (this.dataset && this.dataset.triedOriginal !== "1" && original && this.src !== original) {
+      this.dataset.triedOriginal = "1";
+      this.src = original;
+      return;
+    }
+    this.onerror = null;
+    this.alt = fallbackLabel || "Photo unavailable";
+    this.style.objectFit = "contain";
+    this.style.background = "#1b2d43";
+    this.style.color = "#cbd5e1";
+  };
+}
+
+/* =========================================================
    APPLICATIONS
    ========================================================= */
 
@@ -1075,7 +1104,8 @@ async function loadApps() {
         const img =
           document.createElement("img");
 
-        img.src = app.photo;
+        img.src = getPhotoDisplayUrl(app.photo);
+        setPhotoFallback(img, app.photo, "Photo unavailable");
 
         img.alt = "Member Photo";
 
@@ -1669,7 +1699,7 @@ function showMemberDetails(app) {
       '<div style="margin-bottom:20px;text-align:center">' +
 
       '<img src="' +
-      escapeHtml(app.photo) +
+      escapeHtml(getPhotoDisplayUrl(app.photo)) +
       '"' +
 
       ' alt="Member Photo"' +
@@ -1723,6 +1753,10 @@ function showMemberDetails(app) {
     photoHtml +
     tableHtml;
 
+  const modalPhoto = content.querySelector("img");
+  if (modalPhoto && app.photo) {
+    setPhotoFallback(modalPhoto, app.photo, "Photo unavailable");
+  }
 
   modal.style.display =
     "block";
