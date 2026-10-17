@@ -74,6 +74,12 @@ main,.section,.container{background:transparent!important;color:#e7eef8!importan
 @media(max-width:650px){#editMemberForm .formgrid{grid-template-columns:minmax(0,1fr)!important}#editMemberForm .field[style*="grid-column"]{grid-column:auto!important}}
 
 
+/* Compact application action buttons and allow wrapping instead of oversized row controls */
+#rows td:last-child{min-width:230px;max-width:310px;white-space:normal!important}
+#rows td:last-child .btn{font-size:10px!important;line-height:1.15!important;padding:7px 8px!important;min-height:29px!important;margin:3px 3px 3px 0!important;border-radius:7px!important;letter-spacing:.1px!important;white-space:normal!important}
+#rows td:last-child{display:table-cell}
+@media(max-width:720px){#rows td:last-child{min-width:190px;max-width:240px}#rows td:last-child .btn{font-size:9px!important;padding:6px 7px!important}}
+
 /* Layout fixes: keep the sidebar readable and prevent the organization note from overflowing */
 .rs-layout{grid-template-columns:235px minmax(0,1fr)!important;gap:18px!important}
 .rs-sidebar{width:auto!important;min-width:0!important;padding:14px 12px!important;overflow:hidden!important}
@@ -212,6 +218,8 @@ main,.section,.container{background:transparent!important;color:#e7eef8!importan
     <option value="REJECTED">Rejected</option>
   </select>
   <select id="appPageSize" aria-label="Rows per page" style="padding:10px;border:1px solid #ccc;border-radius:6px">
+    <option value="5">5 per page</option>
+    <option value="10">10 per page</option>
     <option value="20">20 per page</option>
     <option value="50">50 per page</option>
     <option value="100">100 per page</option>
@@ -301,6 +309,7 @@ CLOSE
         <div class="field"><label>Mandal *</label><input name="mandal" required maxlength="100"></div>
         <div class="field"><label>District *</label><input name="district" required maxlength="100"></div>
         <div class="field" style="grid-column:1/-1"><label>Address *</label><textarea name="address" required rows="3" maxlength="500" style="width:100%;box-sizing:border-box"></textarea></div>
+        <div class="field" style="grid-column:1/-1"><label>Member Photo (optional — new photo upload karne par purani photo replace hogi)</label><input name="photoFile" id="editMemberPhotoFile" type="file" accept="image/*"><div style="display:flex;align-items:center;gap:12px;margin-top:10px"><img id="editMemberPhotoPreview" alt="Current member photo" style="display:none;width:76px;height:92px;object-fit:cover;border-radius:8px;border:1px solid #2a4260"><span id="editMemberPhotoHint" style="color:#9bb0ca;font-size:12px">Photo select karna optional hai.</span></div></div>
       </div>
       <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap">
         <button type="button" class="btn" id="cancelEditMemberBtn">CANCEL</button>
@@ -1658,6 +1667,16 @@ function openEditMember(app) {
   ["applicationId","name","fatherName","mobile","email","dob","address","state","mandal","district"].forEach(key => {
     if (form.elements[key]) form.elements[key].value = app[key] || "";
   });
+  const photoInput = document.getElementById("editMemberPhotoFile");
+  const preview = document.getElementById("editMemberPhotoPreview");
+  const hint = document.getElementById("editMemberPhotoHint");
+  if (photoInput) photoInput.value = "";
+  if (preview) {
+    preview.style.display = app.photo ? "block" : "none";
+    preview.src = app.photo ? getPhotoDisplayUrl(app.photo) : "";
+    if (app.photo) setPhotoFallback(preview, app.photo, "Photo unavailable");
+  }
+  if (hint) hint.textContent = app.photo ? "Current photo. Nayi photo select karne par replace hogi." : "Abhi photo nahi hai; yahan upload kar sakte hain.";
   modal.style.display = "block";
 }
 
@@ -1671,14 +1690,42 @@ document.getElementById("cancelEditMemberBtn").addEventListener("click", closeEd
 document.getElementById("editMemberModal").addEventListener("click", function(e) {
   if (e.target === this) closeEditMember();
 });
+document.getElementById("editMemberPhotoFile").addEventListener("change", function() {
+  const file = this.files && this.files[0];
+  const preview = document.getElementById("editMemberPhotoPreview");
+  const hint = document.getElementById("editMemberPhotoHint");
+  if (!file) return;
+  if (!file.type.startsWith("image/")) {
+    this.value = "";
+    hint.textContent = "Sirf image file select karein.";
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    this.value = "";
+    hint.textContent = "Photo 5 MB se chhoti honi chahiye.";
+    return;
+  }
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = "block";
+  hint.textContent = file.name + " selected";
+});
+
 document.getElementById("editMemberForm").addEventListener("submit", async function(e) {
   e.preventDefault();
   if (!editingMemberRecord) return;
   const form = e.currentTarget;
   const btn = document.getElementById("saveEditMemberBtn");
   const msg = document.getElementById("editMemberMsg");
+  const photoFile = document.getElementById("editMemberPhotoFile").files[0];
+  const photoData = photoFile ? await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(new Error("Photo read nahi ho paayi."));
+    reader.readAsDataURL(photoFile);
+  }) : "";
   const payload = {
     action: "editMember",
+    photoData: photoData,
     adminId: admin.adminId,
     password: admin.password,
     managedAdminId: activeManagedAdminId || "",
