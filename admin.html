@@ -211,8 +211,6 @@ main,.section,.container{background:transparent!important;color:#e7eef8!importan
     <option value="REJECTED">Rejected</option>
   </select>
   <select id="appPageSize" aria-label="Rows per page" style="padding:10px;border:1px solid #ccc;border-radius:6px">
-   <option value="5">5 per page</option>
-   <option value="10">10 per page</option>
     <option value="20">20 per page</option>
     <option value="50">50 per page</option>
     <option value="100">100 per page</option>
@@ -300,6 +298,19 @@ REFRESH ADMINS
 
 <div id="adminMsg" class="msg"></div>
 
+<div class="form" style="margin-top:15px">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <div><h4 style="margin:0 0 5px">Subordinate Admin Reports</h4><p style="margin:0;color:#9fb4cc">Apne adhikar kshetra ke admins ke total, approved, pending aur rejected members.</p></div>
+    <button type="button" class="btn red" id="refreshAdminReportsBtn">REFRESH REPORTS</button>
+  </div>
+  <div class="tablewrap" style="margin-top:12px">
+    <table class="table">
+      <thead><tr><th>Admin ID</th><th>Role</th><th>State</th><th>Mandal</th><th>District</th><th>Total</th><th>Approved</th><th>Pending</th><th>Rejected</th></tr></thead>
+      <tbody id="adminReportRows"><tr><td colspan="9">Refresh Reports par click karein.</td></tr></tbody>
+    </table>
+  </div>
+  <div id="adminReportMsg" class="msg"></div>
+</div>
 
 <div class="form" style="margin-top:15px">
 
@@ -1299,6 +1310,14 @@ async function loadApps() {
           act(app.applicationId, "reject");
 
         action.appendChild(rejectApproved);
+
+        const downloadId = document.createElement("button");
+        downloadId.type = "button";
+        downloadId.className = "btn red";
+        downloadId.textContent = "DOWNLOAD ID CARD";
+        downloadId.style.marginTop = "6px";
+        downloadId.onclick = () => downloadMemberIdCard(app);
+        action.appendChild(downloadId);
 
       }
       else if (
@@ -3041,6 +3060,67 @@ document
 
 
 /* =========================================================
+   ADMIN REPORTS
+   ========================================================= */
+async function loadAdminPerformance() {
+  const tbody = document.getElementById("adminReportRows");
+  const msg = document.getElementById("adminReportMsg");
+  if (!tbody || !admin || !admin.adminId) return;
+  tbody.innerHTML = "<tr><td colspan='9'>Loading reports...</td></tr>";
+  if (msg) msg.style.display = "none";
+  try {
+    const r = await api({ action: "adminPerformance", adminId: admin.adminId, password: admin.password });
+    if (!r || !r.success) {
+      tbody.innerHTML = "<tr><td colspan='9'>Reports load nahi ho paayi.</td></tr>";
+      if (msg) showMessage(msg, (r && r.message) || "Reports load failed.", false);
+      return;
+    }
+    const reports = r.reports || [];
+    if (!reports.length) {
+      tbody.innerHTML = "<tr><td colspan='9'>Is admin ke neeche koi active subordinate admin nahi mila.</td></tr>";
+      return;
+    }
+    tbody.innerHTML = "";
+    reports.forEach(item => {
+      const tr = document.createElement("tr");
+      [item.adminId, roleText(item.role), item.state || "—", item.mandal || "—", item.district || "—", item.total, item.approved, item.pending, item.rejected].forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = value == null ? "0" : String(value);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+  } catch (e) {
+    tbody.innerHTML = "<tr><td colspan='9'>Error loading reports.</td></tr>";
+    if (msg) showMessage(msg, e.message || "Reports load failed.", false);
+  }
+}
+
+/* =========================================================
+   DOWNLOAD / PRINT MEMBER ID CARD
+   Uses print-to-PDF so Drive photo links do not taint a canvas.
+   ========================================================= */
+function downloadMemberIdCard(app) {
+  if (!app || String(app.status || "").toUpperCase() !== "APPROVED") {
+    alert("ID Card sirf Approved member ka download kiya ja sakta hai.");
+    return;
+  }
+  const w = window.open("", "_blank", "width=760,height=650");
+  if (!w) {
+    alert("ID Card window browser ne block kar di. Pop-ups allow karke dobara try karein.");
+    return;
+  }
+  const esc = value => String(value == null ? "" : value).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+  const photo = app.photo ? getPhotoDisplayUrl(app.photo) : "";
+  const photoMarkup = photo ? `<img class="photo" src="${esc(photo)}" alt="Member photo" onerror="this.style.display='none'">` : `<div class="photo empty">PHOTO</div>`;
+  w.document.open();
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>RastriyaSenaa ID Card - ${esc(app.memberId)}</title><style>
+  *{box-sizing:border-box}body{font-family:Arial,sans-serif;background:#eef2f6;margin:0;padding:24px;color:#10243b}.card{width:340px;min-height:520px;margin:0 auto;background:#fff;border:2px solid #073f3b;border-radius:16px;overflow:hidden;box-shadow:0 8px 26px #0002}.head{background:#073f3b;color:white;text-align:center;padding:18px 12px}.head h1{font-size:21px;margin:0}.head p{font-size:10px;letter-spacing:2px;margin:5px 0 0}.stripe{height:6px;background:#09b6cc}.body{text-align:center;padding:18px}.photo{width:100px;height:120px;object-fit:cover;border:3px solid #e2b63d;border-radius:8px;display:block;margin:0 auto 12px}.photo.empty{display:flex;align-items:center;justify-content:center;background:#eef2f6;color:#607080}.name{font-size:20px;font-weight:700;margin:8px 0 4px}.post{font-size:13px;color:#087b72;font-weight:700;margin-bottom:12px}.id{background:#edf5f5;border-radius:8px;padding:10px;font-size:14px;font-weight:700;margin:10px 0}.details{text-align:left;font-size:12px;line-height:1.7}.foot{background:#073f3b;color:white;text-align:center;padding:12px;font-weight:700;font-size:12px}.tools{text-align:center;margin:14px}.tools button{padding:10px 18px;border:0;border-radius:6px;background:#073f3b;color:white;font-weight:bold;cursor:pointer}@page{size:A4 portrait;margin:15mm}@media print{body{background:white;padding:0}.card{box-shadow:none;margin:0 auto}.tools{display:none}}
+  </style></head><body><div class="card"><div class="head"><h1>RastriyaSenaa</h1><p>MEMBERSHIP IDENTITY CARD</p></div><div class="stripe"></div><div class="body">${photoMarkup}<div class="name">${esc(app.name || "Member")}</div><div class="post">${esc(app.post || "सदस्य")}</div><div class="id">Member ID: ${esc(app.memberId || "—")}</div><div class="details"><b>Father Name:</b> ${esc(app.fatherName || "—")}<br><b>State:</b> ${esc(app.state || "—")}<br><b>Mandal:</b> ${esc(app.mandal || "—")}<br><b>District:</b> ${esc(app.district || "—")}<br><b>Mobile:</b> ${esc(app.mobile || "—")}</div></div><div class="foot">JAI BHIM · JAI SAMVIDHAN</div></div><div class="tools"><button onclick="window.print()">Download / Save as PDF</button></div><script>window.onload=()=>setTimeout(()=>window.print(),700);<\/script></body></html>`);
+  w.document.close();
+}
+
+/* =========================================================
    ADMIN LIST
    ========================================================= */
 
@@ -3568,6 +3648,7 @@ function showRsView(view) {
   if (crumb) crumb.textContent = title + " · RastriyaSenaa Admin Portal";
   if (view === "members") applyAppTableView();
   if (view === "admins" && typeof loadAdmins === "function") loadAdmins();
+  if (view === "admins" && typeof loadAdminPerformance === "function") loadAdminPerformance();
 }
 function updateRsDashboard(apps) {
   const list = Array.isArray(apps) ? apps : [];
@@ -3606,6 +3687,8 @@ function updateRsDashboard(apps) {
 document.querySelectorAll("[data-rs-view]").forEach(btn => {
   btn.addEventListener("click", () => showRsView(btn.getAttribute("data-rs-view")));
 });
+const reportsRefreshButton = document.getElementById("refreshAdminReportsBtn");
+if (reportsRefreshButton) reportsRefreshButton.addEventListener("click", loadAdminPerformance);
 ["rsDashRefresh", "rsMembersRefresh"].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.addEventListener("click", () => loadApps());
