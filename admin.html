@@ -298,6 +298,11 @@ REFRESH ADMINS
 
 <div id="adminMsg" class="msg"></div>
 
+<div id="managedAdminBanner" class="form" style="display:none;margin-top:15px;border:1px solid #08b7d2;background:#0b2940">
+  <strong id="managedAdminBannerText">Managing subordinate Admin</strong>
+  <button type="button" class="btn red" id="exitManagedAdminBtn" style="margin-left:12px">EXIT MANAGE MODE</button>
+</div>
+
 <div class="form" style="margin-top:15px">
   <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
     <div><h4 style="margin:0 0 5px">Subordinate Admin Reports</h4><p style="margin:0;color:#9fb4cc">Apne adhikar kshetra ke admins ke total, approved, pending aur rejected members.</p></div>
@@ -305,8 +310,8 @@ REFRESH ADMINS
   </div>
   <div class="tablewrap" style="margin-top:12px">
     <table class="table">
-      <thead><tr><th>Admin ID</th><th>Role</th><th>State</th><th>Mandal</th><th>District</th><th>Total</th><th>Approved</th><th>Pending</th><th>Rejected</th></tr></thead>
-      <tbody id="adminReportRows"><tr><td colspan="9">Refresh Reports par click karein.</td></tr></tbody>
+      <thead><tr><th>Admin ID</th><th>Role</th><th>State</th><th>Mandal</th><th>District</th><th>Total</th><th>Approved</th><th>Pending</th><th>Rejected</th><th>Action</th></tr></thead>
+      <tbody id="adminReportRows"><tr><td colspan="10">Refresh Reports par click karein.</td></tr></tbody>
     </table>
   </div>
   <div id="adminReportMsg" class="msg"></div>
@@ -439,6 +444,7 @@ Admin list load karne ke liye refresh karein.
 
 <script>
 
+let activeManagedAdminId = "";
 let admin = {};
 let locations = [];
 let appTablePage = 1;
@@ -985,7 +991,9 @@ async function loadApps() {
           admin.adminId,
 
         password:
-          admin.password
+          admin.password,
+
+        managedAdminId: activeManagedAdminId || ""
 
       });
 
@@ -1548,7 +1556,9 @@ async function act(
           admin.adminId,
 
         password:
-          admin.password
+          admin.password,
+
+        managedAdminId: activeManagedAdminId || ""
 
       });
 
@@ -1924,7 +1934,9 @@ async function savePost(
           admin.adminId,
 
         password:
-          admin.password
+          admin.password,
+
+        managedAdminId: activeManagedAdminId || ""
 
       });
 
@@ -3071,13 +3083,13 @@ async function loadAdminPerformance() {
   try {
     const r = await api({ action: "adminPerformance", adminId: admin.adminId, password: admin.password });
     if (!r || !r.success) {
-      tbody.innerHTML = "<tr><td colspan='9'>Reports load nahi ho paayi.</td></tr>";
+      tbody.innerHTML = "<tr><td colspan='10'>Reports load nahi ho paayi.</td></tr>";
       if (msg) showMessage(msg, (r && r.message) || "Reports load failed.", false);
       return;
     }
     const reports = r.reports || [];
     if (!reports.length) {
-      tbody.innerHTML = "<tr><td colspan='9'>Is admin ke neeche koi active subordinate admin nahi mila.</td></tr>";
+      tbody.innerHTML = "<tr><td colspan='10'>Is admin ke neeche koi active subordinate admin nahi mila.</td></tr>";
       return;
     }
     tbody.innerHTML = "";
@@ -3088,13 +3100,42 @@ async function loadAdminPerformance() {
         td.textContent = value == null ? "0" : String(value);
         tr.appendChild(td);
       });
+      const actionTd = document.createElement("td");
+      const manageBtn = document.createElement("button");
+      manageBtn.type = "button";
+      manageBtn.className = "btn red";
+      manageBtn.textContent = "MANAGE ADMIN";
+      manageBtn.addEventListener("click", () => enterManagedAdminMode(item));
+      actionTd.appendChild(manageBtn);
+      tr.appendChild(actionTd);
       tbody.appendChild(tr);
     });
   } catch (e) {
-    tbody.innerHTML = "<tr><td colspan='9'>Error loading reports.</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='10'>Error loading reports.</td></tr>";
     if (msg) showMessage(msg, e.message || "Reports load failed.", false);
   }
 }
+
+
+function enterManagedAdminMode(item) {
+  if (!item || !item.adminId) return;
+  if (!confirm("Kya aap " + item.adminId + " ke member records ko manage mode mein kholna chahte hain?")) return;
+  activeManagedAdminId = String(item.adminId);
+  const banner = document.getElementById("managedAdminBanner");
+  const text = document.getElementById("managedAdminBannerText");
+  if (banner) banner.style.display = "block";
+  if (text) text.textContent = "MANAGE MODE: " + item.adminId + " · " + roleText(item.role) + " · " + (item.district || item.mandal || item.state || "Assigned area");
+  showRsView("members");
+  loadApps();
+}
+function exitManagedAdminMode() {
+  activeManagedAdminId = "";
+  const banner = document.getElementById("managedAdminBanner");
+  if (banner) banner.style.display = "none";
+  loadApps();
+}
+const exitManagedAdminBtn = document.getElementById("exitManagedAdminBtn");
+if (exitManagedAdminBtn) exitManagedAdminBtn.addEventListener("click", exitManagedAdminMode);
 
 /* =========================================================
    DOWNLOAD / PRINT MEMBER ID CARD
