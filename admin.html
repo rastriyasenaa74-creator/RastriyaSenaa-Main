@@ -303,19 +303,7 @@ REFRESH ADMINS
   <button type="button" class="btn red" id="exitManagedAdminBtn" style="margin-left:12px">EXIT MANAGE MODE</button>
 </div>
 
-<div class="form" style="margin-top:15px">
-  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-    <div><h4 style="margin:0 0 5px">Subordinate Admin Reports</h4><p style="margin:0;color:#9fb4cc">Apne adhikar kshetra ke admins ke total, approved, pending aur rejected members.</p></div>
-    <button type="button" class="btn red" id="refreshAdminReportsBtn">REFRESH REPORTS</button>
-  </div>
-  <div class="tablewrap" style="margin-top:12px">
-    <table class="table">
-      <thead><tr><th>Admin ID</th><th>Role</th><th>State</th><th>Mandal</th><th>District</th><th>Total</th><th>Approved</th><th>Pending</th><th>Rejected</th><th>Action</th></tr></thead>
-      <tbody id="adminReportRows"><tr><td colspan="10">Refresh Reports par click karein.</td></tr></tbody>
-    </table>
-  </div>
-  <div id="adminReportMsg" class="msg"></div>
-</div>
+
 
 <div class="form" style="margin-top:15px">
 
@@ -410,18 +398,14 @@ APPOINT ADMIN
 <th>State</th>
 <th>Mandal</th>
 <th>District</th>
+<th>Total Members</th>
 <th>Status</th>
 <th>Action</th>
 </tr>
 </thead>
 
 <tbody id="adminRows">
-
-<tr>
-<td colspan="8">
-Admin list load karne ke liye refresh karein.
-</td>
-</tr>
+<tr><td colspan="12">Admin list load karne ke liye refresh karein.</td></tr>
 
 </tbody>
 
@@ -3075,47 +3059,9 @@ document
    ADMIN REPORTS
    ========================================================= */
 async function loadAdminPerformance() {
-  const tbody = document.getElementById("adminReportRows");
-  const msg = document.getElementById("adminReportMsg");
-  if (!tbody || !admin || !admin.adminId) return;
-  tbody.innerHTML = "<tr><td colspan='9'>Loading reports...</td></tr>";
-  if (msg) msg.style.display = "none";
-  try {
-    const r = await api({ action: "adminPerformance", adminId: admin.adminId, password: admin.password });
-    if (!r || !r.success) {
-      tbody.innerHTML = "<tr><td colspan='10'>Reports load nahi ho paayi.</td></tr>";
-      if (msg) showMessage(msg, (r && r.message) || "Reports load failed.", false);
-      return;
-    }
-    const reports = r.reports || [];
-    if (!reports.length) {
-      tbody.innerHTML = "<tr><td colspan='10'>Is admin ke neeche koi active subordinate admin nahi mila.</td></tr>";
-      return;
-    }
-    tbody.innerHTML = "";
-    reports.forEach(item => {
-      const tr = document.createElement("tr");
-      [item.adminId, roleText(item.role), item.state || "—", item.mandal || "—", item.district || "—", item.total, item.approved, item.pending, item.rejected].forEach(value => {
-        const td = document.createElement("td");
-        td.textContent = value == null ? "0" : String(value);
-        tr.appendChild(td);
-      });
-      const actionTd = document.createElement("td");
-      const manageBtn = document.createElement("button");
-      manageBtn.type = "button";
-      manageBtn.className = "btn red";
-      manageBtn.textContent = "MANAGE ADMIN";
-      manageBtn.addEventListener("click", () => enterManagedAdminMode(item));
-      actionTd.appendChild(manageBtn);
-      tr.appendChild(actionTd);
-      tbody.appendChild(tr);
-    });
-  } catch (e) {
-    tbody.innerHTML = "<tr><td colspan='10'>Error loading reports.</td></tr>";
-    if (msg) showMessage(msg, e.message || "Reports load failed.", false);
-  }
+  // Reports are shown inline in the main Admin Management table.
+  return loadAdmins();
 }
-
 
 function enterManagedAdminMode(item) {
   if (!item || !item.adminId) return;
@@ -3166,250 +3112,158 @@ function downloadMemberIdCard(app) {
    ========================================================= */
 
 async function loadAdmins() {
-
-  if (!canManageAdmins())
-    return;
-
-
-  const rows =
-    document.getElementById(
-      "adminRows"
-    );
-
-
-  const msg =
-    document.getElementById(
-      "adminMsg"
-    );
-
-
-  rows.innerHTML =
-    "<tr><td colspan='8'>Loading admins...</td></tr>";
-
-
+  if (!canManageAdmins()) return;
+  const rows = document.getElementById("adminRows");
+  const msg = document.getElementById("adminMsg");
+  if (!rows) return;
+  rows.innerHTML = "<tr><td colspan='9'>Loading admins...</td></tr>";
+  if (msg) msg.style.display = "none";
   try {
-
-    const r =
-      await api({
-
-        action:
-          "listAdmins",
-
-        adminId:
-          admin.adminId,
-
-        password:
-          admin.password
-
-      });
-
-
-    if (!r.success) {
-
-      showMessage(
-
-        msg,
-
-        r.message ||
-        "Admin list load nahi hui.",
-
-        false
-
-      );
-
-
-      rows.innerHTML =
-        "<tr><td colspan='8'>Unable to load admins.</td></tr>";
-
-
+    const base = { adminId: admin.adminId, password: admin.password };
+    const [listResponse, performanceResponse] = await Promise.all([
+      api({ ...base, action: "listAdmins" }),
+      api({ ...base, action: "adminPerformance" })
+    ]);
+    if (!listResponse || !listResponse.success) {
+      rows.innerHTML = "<tr><td colspan='9'>Admin list load nahi hui.</td></tr>";
+      showMessage(msg, (listResponse && listResponse.message) || "Admin list load failed.", false);
       return;
-
     }
-
-
-    const admins =
-      r.admins || [];
-
-
+    const admins = listResponse.admins || [];
+    const reports = performanceResponse && performanceResponse.success ? (performanceResponse.reports || []) : [];
+    const reportById = new Map(reports.map(item => [String(item.adminId || "").trim().toLowerCase(), item]));
     if (!admins.length) {
-
-      rows.innerHTML =
-        "<tr><td colspan='8'>No admins found.</td></tr>";
-
+      rows.innerHTML = "<tr><td colspan='9'>No admins found.</td></tr>";
       return;
-
     }
-
-
     rows.innerHTML = "";
-
-
     admins.forEach(item => {
-
-      const tr =
-        document.createElement(
-          "tr"
-        );
-
-
-      const id =
-        document.createElement(
-          "td"
-        );
-
-      id.textContent =
-        item.adminId || "";
-
-
-      const email =
-        document.createElement(
-          "td"
-        );
-
-      email.textContent =
-        item.email || "";
-
-
-      const role =
-        document.createElement(
-          "td"
-        );
-
-      role.textContent =
-        roleText(
-          item.role
-        );
-
-
-      const state =
-        document.createElement(
-          "td"
-        );
-
-      state.textContent =
-        item.state || "—";
-
-
-      const mandal =
-        document.createElement(
-          "td"
-        );
-
-      mandal.textContent =
-        item.mandal || "—";
-
-
-      const district =
-        document.createElement(
-          "td"
-        );
-
-      district.textContent =
-        item.district || "—";
-
-
-      const status =
-        document.createElement(
-          "td"
-        );
-
-      status.textContent =
-        item.status || "";
-
-
-      const action =
-        document.createElement(
-          "td"
-        );
-
-
-      const active =
-        String(
-          item.status || ""
-        ).toUpperCase() !==
-        "INACTIVE";
-
-
-      if (active) {
-
-        const btn =
-          document.createElement(
-            "button"
-          );
-
-
-        btn.type = "button";
-
-        btn.className =
-          "btn";
-
-        btn.textContent =
-          "DEACTIVATE";
-
-
-        btn.onclick =
-          () =>
-            deactivateAdmin(
-              item.adminId
-            );
-
-
-        action.appendChild(
-          btn
-        );
-
-      } else {
-
-        action.textContent =
-          "—";
-
+      const tr = document.createElement("tr");
+      const report = reportById.get(String(item.adminId || "").trim().toLowerCase()) || null;
+      const values = [
+        item.adminId || "",
+        item.email || "—",
+        roleText(item.role),
+        item.state || "—",
+        item.mandal || "—",
+        item.district || "—",
+        report ? report.total : "—",
+        item.status || ""
+      ];
+      values.forEach(value => {
+        const td = document.createElement("td");
+        td.textContent = value == null ? "—" : String(value);
+        tr.appendChild(td);
+      });
+      const action = document.createElement("td");
+      action.style.minWidth = "150px";
+      if (String(item.status || "ACTIVE").toUpperCase() !== "INACTIVE") {
+        const roleRank = { MAIN: 0, NATIONAL: 1, STATE: 2, MANDAL: 3, DISTRICT: 4 };
+        const currentRole = String(item.role || "").toUpperCase();
+        const promotionOptions = allowedAdminRoles().filter(role => roleRank[role] != null && roleRank[role] < (roleRank[currentRole] == null ? 99 : roleRank[currentRole]));
+        if (promotionOptions.length) {
+          const promoteBtn = document.createElement("button");
+          promoteBtn.type = "button";
+          promoteBtn.className = "btn";
+          promoteBtn.textContent = "PROMOTE";
+          promoteBtn.style.marginBottom = "5px";
+          promoteBtn.addEventListener("click", () => promoteAdmin(item));
+          action.appendChild(promoteBtn);
+        }
       }
-
-
-      tr.append(
-
-        id,
-        email,
-        role,
-        state,
-        mandal,
-        district,
-        status,
-        action
-
-      );
-
-
+      if (report && String(item.status || "ACTIVE").toUpperCase() !== "INACTIVE") {
+        const manageBtn = document.createElement("button");
+        manageBtn.type = "button";
+        manageBtn.className = "btn";
+        manageBtn.textContent = "MANAGE ADMIN";
+        manageBtn.addEventListener("click", () => enterManagedAdminMode(report));
+        action.appendChild(manageBtn);
+      }
+      if (String(item.adminId || "") !== String(admin.adminId || "")) {
+        const active = String(item.status || "ACTIVE").toUpperCase() !== "INACTIVE";
+        const statusBtn = document.createElement("button");
+        statusBtn.type = "button";
+        statusBtn.className = "btn red";
+        statusBtn.style.marginTop = "5px";
+        statusBtn.textContent = active ? "DEACTIVATE" : "—";
+        if (active) statusBtn.addEventListener("click", () => deactivateAdmin(item.adminId));
+        action.appendChild(statusBtn);
+      }
+      if (!action.childNodes.length) action.textContent = "—";
+      tr.appendChild(action);
       rows.appendChild(tr);
-
     });
-
-
+    if (performanceResponse && !performanceResponse.success && msg) {
+      showMessage(msg, "Admin list aa gayi, lekin member counts load nahi hue: " + (performanceResponse.message || "permission issue"), false);
+    }
   } catch (err) {
-
-    showMessage(
-
-      msg,
-
-      err.message ||
-      "Admin list load failed.",
-
-      false
-
-    );
-
-
-    rows.innerHTML =
-      "<tr><td colspan='8'>Error loading admins.</td></tr>";
-
+    rows.innerHTML = "<tr><td colspan='9'>Admin list load karte waqt error aaya.</td></tr>";
+    if (msg) showMessage(msg, err.message || "Admin list load failed.", false);
   }
-
 }
 
-
-/* =========================================================
-   DEACTIVATE ADMIN
-   ========================================================= */
+async function promoteAdmin(item) {
+  if (!item || !item.adminId) return;
+  const roleRank = { MAIN: 0, NATIONAL: 1, STATE: 2, MANDAL: 3, DISTRICT: 4 };
+  const currentRole = String(item.role || "").toUpperCase();
+  const creatorRole = String(admin.role || "").toUpperCase();
+  const options = allowedAdminRoles().filter(role =>
+    roleRank[role] != null && roleRank[role] < (roleRank[currentRole] == null ? 99 : roleRank[currentRole])
+  );
+  if (!options.length) {
+    alert("Is Admin ko promote karne ka higher role aapke paas available nahi hai.");
+    return;
+  }
+  const labels = options.map((role, i) => (i + 1) + ". " + roleText(role)).join("\n");
+  const choice = prompt("" + item.adminId + " ko kis role par promote karna hai?\n" + labels + "\n\nNumber enter karein:");
+  if (choice == null) return;
+  const index = Number(choice) - 1;
+  if (!Number.isInteger(index) || index < 0 || index >= options.length) {
+    alert("Invalid choice."); return;
+  }
+  const role = options[index];
+  let state = String(item.state || "").trim();
+  let mandal = String(item.mandal || "").trim();
+  let district = String(item.district || "").trim();
+  if (["STATE", "MANDAL", "DISTRICT"].includes(role)) {
+    const entered = prompt("State enter karein:", state);
+    if (entered == null) return;
+    state = entered.trim();
+  } else { state = ""; }
+  if (["MANDAL", "DISTRICT"].includes(role)) {
+    const entered = prompt("Mandal enter karein:", mandal);
+    if (entered == null) return;
+    mandal = entered.trim();
+  } else { mandal = ""; }
+  if (role === "DISTRICT") {
+    const entered = prompt("District enter karein:", district);
+    if (entered == null) return;
+    district = entered.trim();
+  } else { district = ""; }
+  if (!confirm(item.adminId + " ko " + roleText(role) + " par promote karna hai? Isse unka assigned area bhi update hoga.")) return;
+  const msg = document.getElementById("adminMsg");
+  showMessage(msg, "Admin promote ho raha hai...", true);
+  try {
+    const result = await api({
+      action: "promoteAdmin",
+      adminId: admin.adminId,
+      password: admin.password,
+      targetAdminId: item.adminId,
+      role: role,
+      state: state,
+      mandal: mandal,
+      district: district
+    });
+    if (!result || !result.success) {
+      showMessage(msg, (result && result.message) || "Admin promotion failed.", false);
+      return;
+    }
+    showMessage(msg, result.message || "Admin successfully promoted.", true);
+    await loadAdmins();
+  } catch (error) {
+    showMessage(msg, error.message || "Admin promotion failed.", false);
+  }
+}
 
 async function deactivateAdmin(
   targetAdminId
@@ -3728,8 +3582,7 @@ function updateRsDashboard(apps) {
 document.querySelectorAll("[data-rs-view]").forEach(btn => {
   btn.addEventListener("click", () => showRsView(btn.getAttribute("data-rs-view")));
 });
-const reportsRefreshButton = document.getElementById("refreshAdminReportsBtn");
-if (reportsRefreshButton) reportsRefreshButton.addEventListener("click", loadAdminPerformance);
+// Admin counts are merged into the same Admin Management list.
 ["rsDashRefresh", "rsMembersRefresh"].forEach(id => {
   const el = document.getElementById(id);
   if (el) el.addEventListener("click", () => loadApps());
