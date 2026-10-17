@@ -71,6 +71,7 @@ main,.section,.container{background:transparent!important;color:#e7eef8!importan
 @media(max-width:1050px){.rs-layout{grid-template-columns:66px minmax(0,1fr)!important}.rs-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:720px){.rs-layout{grid-template-columns:1fr!important}.rs-sidebar{min-height:0!important;padding:8px!important}.rs-nav{flex-direction:row!important;min-width:0!important;justify-content:space-around!important}.rs-nav button{flex:1!important;min-width:42px!important;padding:10px 6px!important}.rs-nav button span:last-child{display:none!important}.rs-side-label{display:none!important}.rs-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.rs-topbar{margin-top:6px!important}.rs-content{min-width:0!important}}
 @media(max-width:390px){.rs-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.rs-stat{padding:11px!important}.rs-stat-number{font-size:23px!important}}
+@media(max-width:650px){#editMemberForm .formgrid{grid-template-columns:minmax(0,1fr)!important}#editMemberForm .field[style*="grid-column"]{grid-column:auto!important}}
 
 
 /* Layout fixes: keep the sidebar readable and prevent the organization note from overflowing */
@@ -211,8 +212,6 @@ main,.section,.container{background:transparent!important;color:#e7eef8!importan
     <option value="REJECTED">Rejected</option>
   </select>
   <select id="appPageSize" aria-label="Rows per page" style="padding:10px;border:1px solid #ccc;border-radius:6px">
-   <option value="5">5 per page</option>
-   <option value="10">10 per page</option>
     <option value="20">20 per page</option>
     <option value="50">50 per page</option>
     <option value="100">100 per page</option>
@@ -280,6 +279,36 @@ CLOSE
 </div>
 </div>
 
+
+<!-- EDIT MEMBER MODAL -->
+<div id="editMemberModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:10001;padding:16px;overflow:auto">
+  <div class="card" style="max-width:850px;margin:24px auto;background:#0e1e33!important;color:#e7eef8;border:1px solid #2a4260;border-radius:14px;padding:22px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <h3 style="margin:0;color:#e7eef8">Edit Member Details</h3>
+      <button type="button" class="btn" id="closeEditMemberBtn">CLOSE</button>
+    </div>
+    <p style="color:#9bb0ca">Member ID, Application ID aur approval status is form se change nahi honge.</p>
+    <div id="editMemberMsg" class="msg"></div>
+    <form id="editMemberForm">
+      <input type="hidden" name="applicationId">
+      <div class="formgrid" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+        <div class="field"><label>Name *</label><input name="name" required maxlength="120"></div>
+        <div class="field"><label>Father Name *</label><input name="fatherName" required maxlength="120"></div>
+        <div class="field"><label>Mobile *</label><input name="mobile" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10"></div>
+        <div class="field"><label>Email</label><input name="email" type="email" maxlength="160"></div>
+        <div class="field"><label>Date of Birth</label><input name="dob" type="text" placeholder="DD/MM/YYYY or existing format"></div>
+        <div class="field"><label>State *</label><input name="state" required maxlength="100"></div>
+        <div class="field"><label>Mandal *</label><input name="mandal" required maxlength="100"></div>
+        <div class="field"><label>District *</label><input name="district" required maxlength="100"></div>
+        <div class="field" style="grid-column:1/-1"><label>Address *</label><textarea name="address" required rows="3" maxlength="500" style="width:100%;box-sizing:border-box"></textarea></div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap">
+        <button type="button" class="btn" id="cancelEditMemberBtn">CANCEL</button>
+        <button type="submit" class="btn red" id="saveEditMemberBtn">SAVE CHANGES</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <!-- ADMIN MANAGEMENT -->
 <div id="adminManagement"
@@ -1326,6 +1355,17 @@ async function loadApps() {
       }
 
 
+      const editBtn =
+        document.createElement("button");
+
+      editBtn.type = "button";
+      editBtn.className = "btn red";
+      editBtn.textContent = "EDIT DETAILS";
+      editBtn.style.marginTop = "6px";
+      editBtn.style.marginRight = "6px";
+      editBtn.onclick = () => openEditMember(app);
+      action.appendChild(editBtn);
+
       const detailsBtn =
         document.createElement("button");
 
@@ -1602,6 +1642,79 @@ async function act(
 
 }
 
+
+/* =========================================================
+   EDIT MEMBER DETAILS
+   ========================================================= */
+let editingMemberRecord = null;
+
+function openEditMember(app) {
+  editingMemberRecord = app;
+  const modal = document.getElementById("editMemberModal");
+  const form = document.getElementById("editMemberForm");
+  const msg = document.getElementById("editMemberMsg");
+  msg.textContent = "";
+  msg.className = "msg";
+  ["applicationId","name","fatherName","mobile","email","dob","address","state","mandal","district"].forEach(key => {
+    if (form.elements[key]) form.elements[key].value = app[key] || "";
+  });
+  modal.style.display = "block";
+}
+
+function closeEditMember() {
+  document.getElementById("editMemberModal").style.display = "none";
+  editingMemberRecord = null;
+}
+
+document.getElementById("closeEditMemberBtn").addEventListener("click", closeEditMember);
+document.getElementById("cancelEditMemberBtn").addEventListener("click", closeEditMember);
+document.getElementById("editMemberModal").addEventListener("click", function(e) {
+  if (e.target === this) closeEditMember();
+});
+document.getElementById("editMemberForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+  if (!editingMemberRecord) return;
+  const form = e.currentTarget;
+  const btn = document.getElementById("saveEditMemberBtn");
+  const msg = document.getElementById("editMemberMsg");
+  const payload = {
+    action: "editMember",
+    adminId: admin.adminId,
+    password: admin.password,
+    managedAdminId: activeManagedAdminId || "",
+    applicationId: form.elements.applicationId.value.trim(),
+    name: form.elements.name.value.trim(),
+    fatherName: form.elements.fatherName.value.trim(),
+    mobile: form.elements.mobile.value.trim(),
+    email: form.elements.email.value.trim(),
+    dob: form.elements.dob.value.trim(),
+    address: form.elements.address.value.trim(),
+    state: form.elements.state.value.trim(),
+    mandal: form.elements.mandal.value.trim(),
+    district: form.elements.district.value.trim()
+  };
+  if (!/^[0-9]{10}$/.test(payload.mobile)) {
+    msg.className = "msg error";
+    msg.textContent = "Valid 10 digit mobile number enter karein.";
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = "SAVING...";
+  try {
+    const result = await api(payload);
+    if (!result || !result.success) throw new Error((result && result.message) || "Member details save nahi hui.");
+    msg.className = "msg success";
+    msg.textContent = result.message || "Member details updated.";
+    await loadApps();
+    setTimeout(closeEditMember, 500);
+  } catch (err) {
+    msg.className = "msg error";
+    msg.textContent = err.message || "Update failed.";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "SAVE CHANGES";
+  }
+});
 
 /* =========================================================
    MEMBER DETAILS
